@@ -1,11 +1,11 @@
 use core::cell::Cell;
 
-use crate::tick::{TickTimeout, TickTimeoutBuilder};
+use crate::tick::{TickTimeoutNs, TickTimeoutState};
 
 use super::*;
 
-pub type FakeTimeoutBuilder = TickTimeoutBuilder<FakeInstant>;
-pub type FakeTimeout = TickTimeout<FakeInstant>;
+pub type FakeTimeoutNs = TickTimeoutNs<FakeInstant>;
+pub type FakeTimeoutState = TickTimeoutState<FakeInstant>;
 
 static COUNTER: critical_section::Mutex<Cell<u32>> = critical_section::Mutex::new(Cell::new(0));
 

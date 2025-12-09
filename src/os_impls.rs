@@ -29,8 +29,8 @@ impl OsInterface for StdOs {
         StdDelayNs::default()
     }
 
-    fn start_timeout(dur: MicrosDurationU32) -> impl Timeout {
-        StdTimeout::new(dur)
+    fn timeout() -> impl TimeoutNs {
+        StdTimeoutNs {}
     }
 
     fn notifier_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
@@ -54,8 +54,8 @@ impl OsInterface for FakeOs {
         TickDelay::<FakeInstant>::new(1)
     }
 
-    fn start_timeout(dur: MicrosDurationU32) -> impl Timeout {
-        FakeTimeout::new_us(1, dur)
+    fn timeout() -> impl TimeoutNs {
+        FakeTimeoutNs::new(1)
     }
 
     fn notifier_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
@@ -73,6 +73,7 @@ impl OsInterface for FakeOs {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use fugit::ExtU32;
 
     fn os_interface<OS: OsInterface>() {
         let mutex = OS::mutex(0);

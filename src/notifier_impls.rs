@@ -1,4 +1,4 @@
-use super::*;
+use crate::{notifier::*, *};
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
 
@@ -65,7 +65,8 @@ pub struct AtomicNotifyReceiver<OS> {
 
 impl<OS: OsInterface> NotifyWaiter for AtomicNotifyReceiver<OS> {
     fn wait(&self, timeout: MicrosDurationU32) -> bool {
-        let mut t = OS::start_timeout(timeout);
+        let tm = OS::timeout();
+        let mut t = tm.start_us(timeout.ticks());
         while !t.timeout() {
             if self
                 .flag
@@ -147,13 +148,14 @@ mod std_impl {
     #[cfg(test)]
     mod tests {
         use super::*;
+        use fugit::ExtU32;
 
         #[test]
         fn notify() {
             let (n, w) = StdNotifier::new();
-            assert!(!w.wait(1_u32.millis()));
+            assert!(!w.wait(1.millis()));
             n.notify();
-            assert!(w.wait(1_u32.millis()));
+            assert!(w.wait(1.millis()));
         }
     }
 }

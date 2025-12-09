@@ -8,6 +8,7 @@ pub mod notifier;
 pub mod notifier_impls;
 pub mod os_impls;
 pub mod timeout;
+pub mod utils;
 
 pub use mutex_impls::*;
 pub use notifier::*;
@@ -16,7 +17,7 @@ pub use os_impls::*;
 pub use timeout::*;
 
 pub use embedded_hal::{self, delay::DelayNs};
-pub use fugit::{self, ExtU32, MicrosDurationU32};
+pub use fugit;
 
 use mutex_traits::{ConstInit, RawMutex};
 
@@ -56,7 +57,7 @@ pub trait OsInterface: Send + Sync {
 
     fn yield_thread();
     fn delay() -> impl DelayNs;
-    fn start_timeout(dur: MicrosDurationU32) -> impl Timeout;
+    fn timeout() -> impl TimeoutNs;
     fn notifier_isr() -> (impl NotifierIsr, impl NotifyWaiter);
     fn notifier() -> (impl Notifier, impl NotifyWaiter);
 }

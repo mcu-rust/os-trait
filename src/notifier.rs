@@ -1,4 +1,4 @@
-use super::*;
+pub use fugit::MicrosDurationU32;
 
 pub trait NotifierIsr: Send + Sync {
     fn notify_from_isr(&self);

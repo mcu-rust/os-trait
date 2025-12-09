@@ -1,7 +1,6 @@
 use super::*;
-use crate::tick::TickTimeout;
+use crate::tick::TickTimeoutNs;
 use core::marker::PhantomData;
-use fugit::ExtU32Ceil;
 
 /// [`DelayNs`] implementation
 pub struct TickDelay<T> {
@@ -27,8 +26,32 @@ where
 {
     #[inline]
     fn delay_ns(&mut self, ns: u32) {
-        let mut t = TickTimeout::<T>::new_us(self.frequency, ns.nanos_at_least());
-        while !t.timeout() {}
+        let t = TickTimeoutNs::<T>::new(self.frequency);
+        let mut ts = t.start_ns(ns);
+        while !ts.timeout() {
+            #[cfg(feature = "std")]
+            std::thread::sleep(std::time::Duration::from_nanos(1));
+        }
+    }
+
+    #[inline]
+    fn delay_us(&mut self, us: u32) {
+        let t = TickTimeoutNs::<T>::new(self.frequency);
+        let mut ts = t.start_us(us);
+        while !ts.timeout() {
+            #[cfg(feature = "std")]
+            std::thread::sleep(std::time::Duration::from_nanos(1));
+        }
+    }
+
+    #[inline]
+    fn delay_ms(&mut self, ms: u32) {
+        let t = TickTimeoutNs::<T>::new(self.frequency);
+        let mut ts = t.start_ms(ms);
+        while !ts.timeout() {
+            #[cfg(feature = "std")]
+            std::thread::sleep(std::time::Duration::from_nanos(1));
+        }
     }
 }
 
@@ -54,17 +77,33 @@ mod for_std {
         use super::*;
         use std::time::{Duration, Instant};
 
-        #[test]
-        fn delay() {
-            let mut d = StdDelayNs::default();
+        fn test_delay(mut d: impl DelayNs) {
+            let t = Instant::now();
+            d.delay_ns(200_000_000);
+            let elapsed = t.elapsed();
+            assert!(elapsed - Duration::from_millis(200) < Duration::from_millis(100));
 
-            d.delay_ns(1_000_000);
-            d.delay_us(1000);
+            let t = Instant::now();
+            d.delay_us(200_000);
+            let elapsed = t.elapsed();
+            assert!(elapsed - Duration::from_millis(200) < Duration::from_millis(100));
 
             let t = Instant::now();
             d.delay_ms(500);
             let elapsed = t.elapsed();
-            assert!(elapsed - Duration::from_millis(500) < Duration::from_millis(1));
+            assert!(elapsed - Duration::from_millis(500) < Duration::from_millis(100));
+        }
+
+        #[test]
+        fn std_delay() {
+            let d = StdDelayNs::default();
+            test_delay(d);
+        }
+
+        #[test]
+        fn tick_delay() {
+            let d = TickDelay::<Instant>::new(1_000_000);
+            test_delay(d);
         }
     }
 }

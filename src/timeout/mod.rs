@@ -4,26 +4,19 @@ pub mod std_impls;
 pub mod tick;
 
 pub use fake_impls::*;
-pub use fugit::{ExtU32, MicrosDurationU32, MillisDurationU32, NanosDurationU32};
 
-pub trait TimeoutBuilder {
+pub trait TimeoutNs {
     /// Set timeout.
-    fn start_ns(&self, timeout: NanosDurationU32) -> impl Timeout;
-    fn start_us(&self, timeout: MicrosDurationU32) -> impl Timeout;
-    fn start_ms(&self, timeout: MillisDurationU32) -> impl Timeout;
+    fn start_ns(&self, timeout: u32) -> impl TimeoutState;
+    fn start_us(&self, timeout: u32) -> impl TimeoutState;
+    fn start_ms(&self, timeout: u32) -> impl TimeoutState;
 }
 
-pub trait Timeout {
+pub trait TimeoutState {
     /// Check if the time limit expires.
     fn timeout(&mut self) -> bool;
     /// Reset the timeout condition.
     fn restart(&mut self);
-}
-
-/// The difference from [`Timeout`] is that the timeout is set when initialize.
-pub trait PresetTimeoutBuilder {
-    /// Start waiting.
-    fn start(&self) -> impl Timeout;
 }
 
 pub trait TickInstant: Copy {

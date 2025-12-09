@@ -1,70 +1,55 @@
-use fugit::NanosDurationU32;
-
 use super::*;
-use core::{cell::Cell, marker::PhantomData};
+use core::marker::PhantomData;
 
-pub struct TickTimeoutBuilder<T> {
-    frequency: Cell<u32>,
+pub struct TickTimeoutNs<T> {
+    frequency: u32,
     _t: PhantomData<T>,
 }
 
-unsafe impl<T: TickInstant> Sync for TickTimeoutBuilder<T> {}
-
-impl<T> TickTimeoutBuilder<T>
+impl<T> TickTimeoutNs<T>
 where
     T: TickInstant,
 {
-    pub const fn empty() -> Self {
-        Self {
-            frequency: Cell::new(1_000_000),
-            _t: PhantomData,
-        }
-    }
-
     pub fn new(frequency: u32) -> Self {
         Self {
-            frequency: Cell::new(frequency),
+            frequency,
             _t: PhantomData,
         }
     }
-
-    pub fn set(&self, frequency: u32) {
-        critical_section::with(|_| {
-            self.frequency.set(frequency);
-        })
-    }
 }
 
-impl<T> TimeoutBuilder for TickTimeoutBuilder<T>
+impl<T> TimeoutNs for TickTimeoutNs<T>
 where
     T: TickInstant,
 {
     #[inline]
-    fn start_ns(&self, timeout: NanosDurationU32) -> impl Timeout {
-        TickTimeout::<T>::new_ns(self.frequency.get(), timeout)
+    fn start_ns(&self, timeout: u32) -> impl TimeoutState {
+        TickTimeoutState::<T>::new_ns(self.frequency, timeout)
     }
+
     #[inline]
-    fn start_us(&self, timeout: MicrosDurationU32) -> impl Timeout {
-        TickTimeout::<T>::new_us(self.frequency.get(), timeout)
+    fn start_us(&self, timeout: u32) -> impl TimeoutState {
+        TickTimeoutState::<T>::new_us(self.frequency, timeout)
     }
+
     #[inline]
-    fn start_ms(&self, timeout: MillisDurationU32) -> impl Timeout {
-        TickTimeout::<T>::new_ms(self.frequency.get(), timeout)
+    fn start_ms(&self, timeout: u32) -> impl TimeoutState {
+        TickTimeoutState::<T>::new_ms(self.frequency, timeout)
     }
 }
 
-pub struct TickTimeout<T: TickInstant> {
+pub struct TickTimeoutState<T: TickInstant> {
     tick: T,
     timeout_tick: u32,
     elapsed_tick: u32,
 }
 
-impl<T> TickTimeout<T>
+impl<T> TickTimeoutState<T>
 where
     T: TickInstant,
 {
-    pub fn new_ns(frequency: u32, timeout: NanosDurationU32) -> Self {
-        let ns = timeout.ticks() as u64;
+    pub fn new_ns(frequency: u32, timeout: u32) -> Self {
+        let ns = timeout as u64;
         let timeout_tick = (ns * frequency as u64).div_ceil(1_000_000_000);
         assert!(timeout_tick <= u32::MAX as u64);
         Self {
@@ -74,11 +59,11 @@ where
         }
     }
 
-    pub fn new_us(frequency: u32, timeout: MicrosDurationU32) -> Self {
-        let us = timeout.ticks();
-        let timeout_tick = if frequency > 1_000_000 {
+    pub fn new_us(frequency: u32, timeout: u32) -> Self {
+        let us = timeout;
+        let timeout_tick = if frequency >= 1_000_000 {
             us.checked_mul(frequency / 1_000_000).unwrap()
-        } else if frequency > 1_000 {
+        } else if frequency >= 1_000 {
             us.checked_mul(frequency / 1_000).unwrap().div_ceil(1_000)
         } else {
             us.checked_mul(frequency).unwrap().div_ceil(1_000_000)
@@ -91,9 +76,9 @@ where
         }
     }
 
-    pub fn new_ms(frequency: u32, timeout: MillisDurationU32) -> Self {
-        let ms = timeout.ticks();
-        let timeout_tick = if frequency > 1_000 {
+    pub fn new_ms(frequency: u32, timeout: u32) -> Self {
+        let ms = timeout;
+        let timeout_tick = if frequency >= 1_000 {
             ms.checked_mul(frequency / 1_000).unwrap()
         } else {
             ms.checked_mul(frequency).unwrap().div_ceil(1_000)
@@ -107,7 +92,7 @@ where
     }
 }
 
-impl<T> Timeout for TickTimeout<T>
+impl<T> TimeoutState for TickTimeoutState<T>
 where
     T: TickInstant,
 {
@@ -155,7 +140,6 @@ impl Num for u64 {
 #[cfg(test)]
 mod tests {
     use core::ops::Div;
-
     use fugit::{ExtU32, ExtU32Ceil, MicrosDurationU32, MillisDurationU32};
 
     #[test]
