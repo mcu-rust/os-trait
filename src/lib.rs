@@ -2,24 +2,23 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod delay_impls;
 pub mod mutex_impls;
 pub mod notifier;
 pub mod notifier_impls;
 pub mod os_impls;
+pub mod prelude;
 pub mod timeout;
-pub mod utils;
 
-pub use mutex_impls::*;
-pub use notifier::*;
-pub use notifier_impls::*;
-pub use os_impls::*;
+pub use embedded_hal;
+pub use fugit;
+pub use mutex_impls::{FakeRawMutex, Mutex};
+pub use mutex_traits;
+pub use notifier_impls::FakeNotifier;
+pub use os_impls::FakeOs;
 pub use timeout::*;
 
-pub use embedded_hal::{self, delay::DelayNs};
-pub use fugit;
-
 use mutex_traits::{ConstInit, RawMutex};
+use prelude::*;
 
 #[cfg(not(feature = "std"))]
 extern crate alloc;
@@ -31,7 +30,7 @@ extern crate alloc;
 /// And you can implement your own mutex by implementing the `RawMutex` trait from the `mutex-traits` crate.
 ///
 /// ```
-/// use os_traits::*;
+/// use os_traits::{prelude::*, os_impls::{FakeOs, StdOs}};
 ///
 /// fn os_interface<OS: OsInterface>() {
 ///     let mutex = OS::mutex(2);
@@ -56,8 +55,8 @@ pub trait OsInterface: Send + Sync {
     fn timeout() -> impl TimeoutNs;
 
     #[inline]
-    fn mutex<T>(d: T) -> BlockingMutex<Self::RawMutex, T> {
-        BlockingMutex::new(d)
+    fn mutex<T>(d: T) -> Mutex<Self, T> {
+        Mutex::<Self, T>::new(d)
     }
 
     #[inline]

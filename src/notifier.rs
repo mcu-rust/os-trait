@@ -1,4 +1,4 @@
-pub use fugit::MicrosDurationU32;
+use crate::fugit::MicrosDurationU32;
 
 pub trait NotifyBuilder {
     fn build() -> (impl Notifier, impl NotifyWaiter);

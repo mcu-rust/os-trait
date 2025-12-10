@@ -1,9 +1,9 @@
-use crate::{
-    timeout::{tick::*, *},
-    *,
+use super::{
+    fugit::{KilohertzU32, MicrosDurationU32},
+    prelude::*,
+    tick_impl::*,
 };
 use core::{cell::Cell, marker::PhantomData};
-use fugit::{KilohertzU32, MicrosDurationU32};
 
 /// Can be used as a static holder
 pub struct FrequencyHolder<T> {

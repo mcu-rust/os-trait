@@ -1,15 +1,51 @@
+pub mod delay_impls;
 pub mod fake_impls;
+pub mod prelude;
 #[cfg(feature = "std")]
 pub mod std_impls;
-pub mod tick;
+pub mod tick_impl;
+pub mod utils;
 
+pub use delay_impls::TickDelay;
+pub use embedded_hal;
 pub use fake_impls::*;
-pub use fugit::KilohertzU32;
+pub use fugit::{self, KilohertzU32, MicrosDurationU32};
+pub use tick_impl::{TickTimeoutNs, TickTimeoutState};
 
 pub trait TimeoutNs {
     fn start_ns(&self, timeout: u32) -> impl TimeoutState;
     fn start_us(&self, timeout: u32) -> impl TimeoutState;
     fn start_ms(&self, timeout: u32) -> impl TimeoutState;
+
+    fn ns_with(&self, timeout: u32, mut f: impl FnMut() -> bool) -> bool {
+        let mut t = self.start_ns(timeout);
+        while f() {
+            if t.timeout() {
+                return true;
+            }
+        }
+        false
+    }
+
+    fn us_with(&self, timeout: u32, mut f: impl FnMut() -> bool) -> bool {
+        let mut t = self.start_us(timeout);
+        while f() {
+            if t.timeout() {
+                return true;
+            }
+        }
+        false
+    }
+
+    fn ms_with(&self, timeout: u32, mut f: impl FnMut() -> bool) -> bool {
+        let mut t = self.start_ms(timeout);
+        while f() {
+            if t.timeout() {
+                return true;
+            }
+        }
+        false
+    }
 }
 
 pub trait TimeoutState {

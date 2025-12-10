@@ -1,6 +1,8 @@
-use crate::{notifier::*, *};
-use core::marker::PhantomData;
-use core::sync::atomic::{AtomicBool, Ordering};
+use crate::{fugit::MicrosDurationU32, notifier::*, *};
+use core::{
+    marker::PhantomData,
+    sync::atomic::{AtomicBool, Ordering},
+};
 
 #[derive(Default, Clone)]
 pub struct FakeNotifier;
@@ -35,6 +37,7 @@ impl NotifyWaiter for FakeNotifier {
 
 // ------------------------------------------------------------------
 
+/// This [`Notifier`] implementation is for unit test
 pub struct AtomicNotifier<OS> {
     flag: Arc<AtomicBool>,
     _os: PhantomData<OS>,

@@ -1,7 +1,9 @@
-use super::*;
-use crate::tick::{TickTimeoutNs, TickTimeoutState};
+use super::{
+    fugit::{KilohertzU32, RateExtU32},
+    prelude::*,
+    tick_impl::{TickTimeoutNs, TickTimeoutState},
+};
 use core::cell::Cell;
-use fugit::RateExtU32;
 
 pub type FakeTimeoutNs = TickTimeoutNs<FakeInstant>;
 pub type FakeTimeoutState = TickTimeoutState<FakeInstant>;

@@ -1,5 +1,7 @@
-use super::*;
-use fugit::RateExtU32;
+use super::{
+    fugit::{KilohertzU32, RateExtU32},
+    prelude::*,
+};
 use std::time::{Duration, Instant};
 
 /// [`TimeoutNs`] implementation.
@@ -71,7 +73,7 @@ impl TickInstant for Instant {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::timeout::tick::*;
+    use crate::timeout::tick_impl::*;
     use std::{thread::sleep, time::Duration};
 
     fn test_timeout(timeout: impl TimeoutNs) {
@@ -90,6 +92,11 @@ mod tests {
         sleep(Duration::from_millis(260));
         assert!(t.timeout());
         assert!(!t.timeout());
+
+        assert!(timeout.ns_with(100, || {
+            sleep(Duration::from_nanos(1));
+            true
+        }));
     }
 
     #[test]

@@ -1,5 +1,4 @@
-use super::*;
-use crate::tick::TickTimeoutNs;
+use super::{embedded_hal::delay::DelayNs, prelude::*, tick_impl::TickTimeoutNs};
 use core::marker::PhantomData;
 
 /// [`DelayNs`] implementation

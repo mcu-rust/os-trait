@@ -1,4 +1,4 @@
-use super::*;
+use super::prelude::*;
 use core::marker::PhantomData;
 
 pub struct TickTimeoutNs<T> {
@@ -224,6 +224,14 @@ mod tests {
         assert!(!t.timeout());
         MockInstant::add_time(10.millis());
         assert!(t.timeout());
+
+        let mut count = 0;
+        assert!(builder.ns_with(100, || {
+            MockInstant::add_time(10.nanos());
+            count += 1;
+            true
+        }));
+        assert_eq!(count, 10);
 
         let t = TickTimeoutState::<MockInstant>::new_us(40_000_000);
         assert_eq!(t.round, 32);

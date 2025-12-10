@@ -1,15 +1,13 @@
-use super::{delay_impls::TickDelay, *};
+use crate::{
+    mutex_impls::*,
+    notifier_impls::*,
+    prelude::*,
+    timeout::{delay_impls::*, fake_impls::*},
+};
 cfg_if::cfg_if! {
     if #[cfg(feature = "std")] {
-        pub use std::sync::Arc;
-
         use std::thread;
         use super::timeout::std_impls::*;
-        use super::delay_impls::*;
-    } else {
-        pub use alloc::vec::Vec;
-        pub use alloc::boxed::Box;
-        pub use alloc::sync::Arc;
     }
 }
 
