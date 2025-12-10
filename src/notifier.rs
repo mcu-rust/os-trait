@@ -1,5 +1,10 @@
 pub use fugit::MicrosDurationU32;
 
+pub trait NotifyBuilder {
+    fn build() -> (impl Notifier, impl NotifyWaiter);
+    fn build_isr() -> (impl NotifierIsr, impl NotifyWaiter);
+}
+
 pub trait NotifierIsr: Send + Sync {
     fn notify_from_isr(&self) -> bool;
 }

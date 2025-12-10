@@ -49,15 +49,24 @@ extern crate alloc;
 /// ```
 pub trait OsInterface: Send + Sync {
     type RawMutex: ConstInit + RawMutex;
+    type NotifyBuilder: NotifyBuilder;
+
+    fn yield_thread();
+    fn delay() -> impl DelayNs;
+    fn timeout() -> impl TimeoutNs;
 
     #[inline]
     fn mutex<T>(d: T) -> BlockingMutex<Self::RawMutex, T> {
         BlockingMutex::new(d)
     }
 
-    fn yield_thread();
-    fn delay() -> impl DelayNs;
-    fn timeout() -> impl TimeoutNs;
-    fn notifier_isr() -> (impl NotifierIsr, impl NotifyWaiter);
-    fn notifier() -> (impl Notifier, impl NotifyWaiter);
+    #[inline]
+    fn notifier_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
+        Self::NotifyBuilder::build_isr()
+    }
+
+    #[inline]
+    fn notifier() -> (impl Notifier, impl NotifyWaiter) {
+        Self::NotifyBuilder::build()
+    }
 }

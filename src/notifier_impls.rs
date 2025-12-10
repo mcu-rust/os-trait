@@ -5,8 +5,12 @@ use core::sync::atomic::{AtomicBool, Ordering};
 #[derive(Default)]
 pub struct FakeNotifier;
 
-impl FakeNotifier {
-    pub fn new() -> (Self, Self) {
+impl NotifyBuilder for FakeNotifier {
+    fn build() -> (impl Notifier, impl NotifyWaiter) {
+        (Self {}, Self {})
+    }
+
+    fn build_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
         (Self {}, Self {})
     }
 }
@@ -37,16 +41,26 @@ pub struct AtomicNotifier<OS> {
 }
 
 impl<OS: OsInterface> AtomicNotifier<OS> {
-    pub fn new() -> (Self, AtomicNotifyReceiver<OS>) {
+    pub fn new() -> (Self, impl NotifyWaiter) {
         let s = Self {
             flag: Arc::new(AtomicBool::new(false)),
             _os: PhantomData,
         };
-        let r = AtomicNotifyReceiver {
+        let r = AtomicNotifyReceiver::<OS> {
             flag: Arc::clone(&s.flag),
             _os: PhantomData,
         };
         (s, r)
+    }
+}
+
+impl<OS: OsInterface> NotifyBuilder for AtomicNotifier<OS> {
+    fn build() -> (impl Notifier, impl NotifyWaiter) {
+        Self::new()
+    }
+
+    fn build_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
+        Self::new()
     }
 }
 
@@ -114,6 +128,16 @@ mod std_impl {
                 flag: Arc::clone(&s.flag),
             };
             (s, r)
+        }
+    }
+
+    impl NotifyBuilder for StdNotifier {
+        fn build() -> (impl Notifier, impl NotifyWaiter) {
+            Self::new()
+        }
+
+        fn build_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
+            Self::new()
         }
     }
 

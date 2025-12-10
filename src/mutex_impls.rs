@@ -13,7 +13,7 @@ use mutex_traits::{ConstInit, RawMutex};
 
 /// A fake mutex is for testing.
 /// It does not provide any synchronization between threads,
-pub struct FakeRawMutex {}
+pub struct FakeRawMutex;
 
 impl FakeRawMutex {
     /// Create a new `FakeRawMutex`.
