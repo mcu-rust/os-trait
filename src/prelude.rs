@@ -1,4 +1,4 @@
-pub use crate::{OsInterface, notifier::*, timeout::prelude::*};
+pub use crate::{OsInterface, notifier::*, timeout_trait::prelude::*};
 pub use embedded_hal::delay::DelayNs;
 
 cfg_if::cfg_if! {

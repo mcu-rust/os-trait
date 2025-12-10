@@ -4,7 +4,7 @@
     version = "0.1.0"
 
 [features]
-    std = ["critical-section/std"]
+    std = ["critical-section/std", "timeout-trait/std"]
     std-custom-mutex = ["std", "mutex/std"]
 
 [dependencies]
@@ -14,3 +14,4 @@
     fugit = "0.3"
     mutex = "1"
     mutex-traits = "1"
+    timeout-trait = "0.1"

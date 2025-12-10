@@ -2,12 +2,12 @@ use crate::{
     mutex_impls::*,
     notifier_impls::*,
     prelude::*,
-    timeout::{delay_impls::*, fake_impls::*},
+    timeout_trait::{delay_impls::*, fake_impls::*},
 };
 cfg_if::cfg_if! {
     if #[cfg(feature = "std")] {
         use std::thread;
-        use super::timeout::std_impls::*;
+        use crate::timeout_trait::std_impls::*;
     }
 }
 
@@ -26,7 +26,7 @@ impl OsInterface for StdOs {
     }
 
     fn delay() -> impl DelayNs {
-        StdDelayNs::default()
+        StdDelayNs {}
     }
 }
 
@@ -41,7 +41,7 @@ impl OsInterface for FakeOs {
     fn yield_thread() {}
 
     fn delay() -> impl DelayNs {
-        TickDelay::<FakeInstant>::new()
+        TickDelay::<FakeInstant>::default()
     }
 }
 

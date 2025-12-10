@@ -7,18 +7,17 @@ pub mod notifier;
 pub mod notifier_impls;
 pub mod os_impls;
 pub mod prelude;
-pub mod timeout;
 
 pub use embedded_hal;
 pub use fugit;
 pub use mutex_impls::{FakeRawMutex, Mutex};
 pub use mutex_traits;
+pub use mutex_traits::{ConstInit, RawMutex};
 pub use notifier_impls::{AtomicNotifier, FakeNotifier};
 pub use os_impls::FakeOs;
-pub use timeout::*;
+pub use timeout_trait::{self, *};
 
-use mutex_traits::{ConstInit, RawMutex};
-use prelude::*;
+use crate::prelude::*;
 
 #[cfg(not(feature = "std"))]
 extern crate alloc;
