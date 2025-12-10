@@ -97,8 +97,7 @@ pub struct AtomicNotifyReceiver<OS> {
 
 impl<OS: OsInterface> NotifyWaiter for AtomicNotifyReceiver<OS> {
     fn wait(&self, timeout: MicrosDurationU32) -> bool {
-        let tm = OS::timeout();
-        let mut t = tm.start_us(timeout.to_micros());
+        let mut t = OS::Timeout::start_us(timeout.to_micros());
         while !t.timeout() {
             if self
                 .flag

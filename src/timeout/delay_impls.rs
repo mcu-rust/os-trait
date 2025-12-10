@@ -21,9 +21,8 @@ where
 {
     #[inline]
     fn delay_ns(&mut self, ns: u32) {
-        let t = TickTimeoutNs::<T>::new();
-        let mut ts = t.start_ns(ns);
-        while !ts.timeout() {
+        let mut t = TickTimeoutNs::<T>::start_ns(ns);
+        while !t.timeout() {
             // For unit test
             #[cfg(feature = "std")]
             std::thread::sleep(std::time::Duration::from_nanos(1));

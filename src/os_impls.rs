@@ -19,6 +19,7 @@ pub struct StdOs;
 impl OsInterface for StdOs {
     type RawMutex = FakeRawMutex;
     type NotifyBuilder = StdNotifier;
+    type Timeout = StdTimeoutNs;
 
     fn yield_thread() {
         thread::yield_now();
@@ -26,10 +27,6 @@ impl OsInterface for StdOs {
 
     fn delay() -> impl DelayNs {
         StdDelayNs::default()
-    }
-
-    fn timeout() -> impl TimeoutNs {
-        StdTimeoutNs {}
     }
 }
 
@@ -39,15 +36,12 @@ pub struct FakeOs;
 impl OsInterface for FakeOs {
     type RawMutex = FakeRawMutex;
     type NotifyBuilder = FakeNotifier;
+    type Timeout = FakeTimeoutNs;
 
     fn yield_thread() {}
 
     fn delay() -> impl DelayNs {
         TickDelay::<FakeInstant>::new()
-    }
-
-    fn timeout() -> impl TimeoutNs {
-        FakeTimeoutNs::new()
     }
 }
 

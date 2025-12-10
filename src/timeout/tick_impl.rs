@@ -5,31 +5,22 @@ pub struct TickTimeoutNs<T> {
     _t: PhantomData<T>,
 }
 
-impl<T> TickTimeoutNs<T>
-where
-    T: TickInstant,
-{
-    pub fn new() -> Self {
-        Self { _t: PhantomData }
-    }
-}
-
 impl<T> TimeoutNs for TickTimeoutNs<T>
 where
     T: TickInstant,
 {
     #[inline]
-    fn start_ns(&self, timeout: u32) -> impl TimeoutState {
+    fn start_ns(timeout: u32) -> impl TimeoutState {
         TickTimeoutState::<T>::new_ns(timeout)
     }
 
     #[inline]
-    fn start_us(&self, timeout: u32) -> impl TimeoutState {
+    fn start_us(timeout: u32) -> impl TimeoutState {
         TickTimeoutState::<T>::new_us(timeout)
     }
 
     #[inline]
-    fn start_ms(&self, timeout: u32) -> impl TimeoutState {
+    fn start_ms(timeout: u32) -> impl TimeoutState {
         TickTimeoutState::<T>::new_ms(timeout)
     }
 }
@@ -170,8 +161,7 @@ mod tests {
         let now3 = MockInstant::now();
         assert_eq!(now3.tick_since(now2), 10_000);
 
-        let builder = TickTimeoutNs::<MockInstant>::new();
-        let mut t = builder.start_ns(100);
+        let mut t = TickTimeoutNs::<MockInstant>::start_ns(100);
         assert!(!t.timeout());
         MockInstant::add_time(10.nanos());
         assert!(!t.timeout());
@@ -189,7 +179,7 @@ mod tests {
         MockInstant::add_time(10.nanos());
         assert!(t.timeout());
 
-        let mut t = builder.start_us(100);
+        let mut t = TickTimeoutNs::<MockInstant>::start_us(100);
         assert!(!t.timeout());
         MockInstant::add_time(10.micros());
         assert!(!t.timeout());
@@ -207,7 +197,7 @@ mod tests {
         MockInstant::add_time(10.micros());
         assert!(t.timeout());
 
-        let mut t = builder.start_ms(100);
+        let mut t = TickTimeoutNs::<MockInstant>::start_ms(100);
         assert!(!t.timeout());
         MockInstant::add_time(10.millis());
         assert!(!t.timeout());
@@ -226,7 +216,7 @@ mod tests {
         assert!(t.timeout());
 
         let mut count = 0;
-        assert!(builder.ns_with(100, || {
+        assert!(TickTimeoutNs::<MockInstant>::ns_with(100, || {
             MockInstant::add_time(10.nanos());
             count += 1;
             true

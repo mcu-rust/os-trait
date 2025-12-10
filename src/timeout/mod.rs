@@ -13,12 +13,12 @@ pub use fugit::{self, KilohertzU32, MicrosDurationU32};
 pub use tick_impl::{TickTimeoutNs, TickTimeoutState};
 
 pub trait TimeoutNs {
-    fn start_ns(&self, timeout: u32) -> impl TimeoutState;
-    fn start_us(&self, timeout: u32) -> impl TimeoutState;
-    fn start_ms(&self, timeout: u32) -> impl TimeoutState;
+    fn start_ns(timeout: u32) -> impl TimeoutState;
+    fn start_us(timeout: u32) -> impl TimeoutState;
+    fn start_ms(timeout: u32) -> impl TimeoutState;
 
-    fn ns_with(&self, timeout: u32, mut f: impl FnMut() -> bool) -> bool {
-        let mut t = self.start_ns(timeout);
+    fn ns_with(timeout: u32, mut f: impl FnMut() -> bool) -> bool {
+        let mut t = Self::start_ns(timeout);
         while f() {
             if t.timeout() {
                 return true;
@@ -27,8 +27,8 @@ pub trait TimeoutNs {
         false
     }
 
-    fn us_with(&self, timeout: u32, mut f: impl FnMut() -> bool) -> bool {
-        let mut t = self.start_us(timeout);
+    fn us_with(timeout: u32, mut f: impl FnMut() -> bool) -> bool {
+        let mut t = Self::start_us(timeout);
         while f() {
             if t.timeout() {
                 return true;
@@ -37,8 +37,8 @@ pub trait TimeoutNs {
         false
     }
 
-    fn ms_with(&self, timeout: u32, mut f: impl FnMut() -> bool) -> bool {
-        let mut t = self.start_ms(timeout);
+    fn ms_with(timeout: u32, mut f: impl FnMut() -> bool) -> bool {
+        let mut t = Self::start_ms(timeout);
         while f() {
             if t.timeout() {
                 return true;

@@ -1,8 +1,4 @@
-use super::{
-    fugit::{KilohertzU32, MicrosDurationU32},
-    prelude::*,
-    tick_impl::*,
-};
+use super::{fugit::KilohertzU32, prelude::*};
 use core::{cell::Cell, marker::PhantomData};
 
 /// Can be used as a static holder
@@ -32,24 +28,5 @@ where
 
     pub fn get(&self) -> KilohertzU32 {
         self.frequency.get()
-    }
-}
-
-// ------------------------------------------------------------------
-
-pub struct PresetTickTimeout<T> {
-    timeout: TickTimeoutNs<T>,
-    timeout_us: u32,
-}
-impl<T: TickInstant> PresetTickTimeout<T> {
-    pub fn new(timeout: MicrosDurationU32) -> Self {
-        Self {
-            timeout: TickTimeoutNs::<T>::new(),
-            timeout_us: timeout.to_micros(),
-        }
-    }
-
-    pub fn start(&self) -> impl TimeoutState {
-        self.timeout.start_us(self.timeout_us)
     }
 }

@@ -5,25 +5,24 @@ use super::{
 use std::time::{Duration, Instant};
 
 /// [`TimeoutNs`] implementation.
-#[derive(Default)]
 pub struct StdTimeoutNs {}
 
 impl TimeoutNs for StdTimeoutNs {
-    fn start_ns(&self, timeout: u32) -> impl TimeoutState {
+    fn start_ns(timeout: u32) -> impl TimeoutState {
         StdTimeoutState {
             timeout: Duration::from_nanos(timeout.into()),
             start_time: Instant::now(),
         }
     }
 
-    fn start_us(&self, timeout: u32) -> impl TimeoutState {
+    fn start_us(timeout: u32) -> impl TimeoutState {
         StdTimeoutState {
             timeout: Duration::from_micros(timeout.into()),
             start_time: Instant::now(),
         }
     }
 
-    fn start_ms(&self, timeout: u32) -> impl TimeoutState {
+    fn start_ms(timeout: u32) -> impl TimeoutState {
         StdTimeoutState {
             timeout: Duration::from_millis(timeout.into()),
             start_time: Instant::now(),
@@ -76,8 +75,8 @@ mod tests {
     use crate::timeout::tick_impl::*;
     use std::{thread::sleep, time::Duration};
 
-    fn test_timeout(timeout: impl TimeoutNs) {
-        let mut t = timeout.start_ms(500);
+    fn test_timeout<T: TimeoutNs>() {
+        let mut t = T::start_ms(500);
         assert!(!t.timeout());
         sleep(Duration::from_millis(260));
         assert!(!t.timeout());
@@ -93,7 +92,7 @@ mod tests {
         assert!(t.timeout());
         assert!(!t.timeout());
 
-        assert!(timeout.ns_with(100, || {
+        assert!(T::ns_with(100, || {
             sleep(Duration::from_nanos(1));
             true
         }));
@@ -101,14 +100,12 @@ mod tests {
 
     #[test]
     fn std_timeout() {
-        let timeout = StdTimeoutNs::default();
-        test_timeout(timeout);
+        test_timeout::<StdTimeoutNs>();
     }
 
     #[test]
     fn tick_timeout() {
-        let timeout = TickTimeoutNs::<Instant>::new();
-        test_timeout(timeout);
+        test_timeout::<TickTimeoutNs::<Instant>>();
     }
 
     #[test]

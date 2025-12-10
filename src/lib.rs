@@ -13,7 +13,7 @@ pub use embedded_hal;
 pub use fugit;
 pub use mutex_impls::{FakeRawMutex, Mutex};
 pub use mutex_traits;
-pub use notifier_impls::FakeNotifier;
+pub use notifier_impls::{AtomicNotifier, FakeNotifier};
 pub use os_impls::FakeOs;
 pub use timeout::*;
 
@@ -49,10 +49,10 @@ extern crate alloc;
 pub trait OsInterface: Send + Sync {
     type RawMutex: ConstInit + RawMutex;
     type NotifyBuilder: NotifyBuilder;
+    type Timeout: TimeoutNs;
 
     fn yield_thread();
     fn delay() -> impl DelayNs;
-    fn timeout() -> impl TimeoutNs;
 
     #[inline]
     fn mutex<T>(d: T) -> Mutex<Self, T> {
