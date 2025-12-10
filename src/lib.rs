@@ -1,4 +1,9 @@
+//! Traits used to adapter different embedded RTOS.
 //! See [`OsInterface`]
+//!
+//! # Cargo Features
+//!
+//! - `std`: Used for unit test. Disabled by default.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
@@ -14,7 +19,7 @@ pub use mutex_impls::{FakeRawMutex, Mutex};
 pub use mutex_traits;
 pub use mutex_traits::{ConstInit, RawMutex};
 pub use notifier_impls::{AtomicNotifier, FakeNotifier};
-pub use os_impls::FakeOs;
+pub use os_impls::{FakeOs, StdOs};
 pub use timeout_trait::{self, *};
 
 use crate::prelude::*;
@@ -29,7 +34,7 @@ extern crate alloc;
 /// And you can implement your own mutex by implementing the `RawMutex` trait from the `mutex-traits` crate.
 ///
 /// ```
-/// use os_traits::{prelude::*, os_impls::{FakeOs, StdOs}};
+/// use os_trait::{prelude::*, FakeOs, StdOs};
 ///
 /// fn os_interface<OS: OsInterface>() {
 ///     let mutex = OS::mutex(2);

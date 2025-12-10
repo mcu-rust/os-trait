@@ -14,7 +14,8 @@ pub type Mutex<OS, T> = BlockingMutex<<OS as OsInterface>::RawMutex, T>;
 
 /// A fake mutex is for testing.
 /// It does not provide any synchronization between threads,
-pub struct FakeRawMutex;
+#[derive(Default)]
+pub struct FakeRawMutex {}
 
 impl FakeRawMutex {
     /// Create a new `FakeRawMutex`.
@@ -50,6 +51,7 @@ unsafe impl RawMutex for FakeRawMutex {
 }
 
 #[cfg(feature = "std")]
+#[allow(dead_code)]
 mod std_impl {
     use core::marker::PhantomData;
     use mutex_traits::RawMutex;

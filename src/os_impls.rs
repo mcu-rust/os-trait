@@ -51,7 +51,7 @@ impl OsInterface for FakeOs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fugit::ExtU32;
+    use crate::fugit::ExtU32;
 
     fn os_interface<OS: OsInterface>() {
         let mutex = OS::mutex(0);

@@ -1,15 +1,25 @@
 [package]
+    authors = ["Jalon Wong <jalonwong@gmail.com>"]
+    description = "Traits used to adapter different embedded RTOS."
+    documentation = "https://docs.rs/os-trait"
     edition = "2024"
-    name = "os-traits"
+    keywords = ["embedded", "no-std", "RTOS"]
+    license = "MIT OR Apache-2.0"
+    name = "os-trait"
+    readme = "README.md"
+    repository = "https://github.com/mcu-rust/os-trait"
     version = "0.1.0"
 
+
+    [package.metadata.docs.rs]
+        features = ["std"]
+
 [features]
-    std = ["critical-section/std", "timeout-trait/std"]
+    std = ["timeout-trait/std"]
     std-custom-mutex = ["std", "mutex/std"]
 
 [dependencies]
     cfg-if = "1"
-    critical-section = "1"
     embedded-hal = "1"
     fugit = "0.3"
     mutex = "1"
