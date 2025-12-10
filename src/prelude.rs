@@ -4,7 +4,7 @@ pub use embedded_hal::delay::DelayNs;
 cfg_if::cfg_if! {
     if #[cfg(feature = "std")] {
         pub use std::sync::Arc;
-    } else {
+    } else if #[cfg(feature = "alloc")] {
         pub use alloc::vec::Vec;
         pub use alloc::boxed::Box;
         pub use alloc::sync::Arc;

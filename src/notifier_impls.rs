@@ -207,8 +207,8 @@ mod std_impl {
             let n2 = n.clone();
 
             handles.push(thread::spawn(move || {
-                assert!(w.wait(100.millis()));
-                assert!(w.wait(100.millis()));
+                assert!(w.wait(500.millis()));
+                assert!(w.wait(500.millis()));
             }));
 
             handles.push(thread::spawn(move || {

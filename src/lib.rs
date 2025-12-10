@@ -24,7 +24,7 @@ pub use timeout_trait::{self, *};
 
 use crate::prelude::*;
 
-#[cfg(not(feature = "std"))]
+#[cfg(feature = "alloc")]
 extern crate alloc;
 
 /// Adapter for different operating systems.
