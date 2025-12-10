@@ -4,6 +4,7 @@ pub mod std_impls;
 pub mod tick;
 
 pub use fake_impls::*;
+pub use fugit::KilohertzU32;
 
 pub trait TimeoutNs {
     /// Set timeout.
@@ -20,6 +21,7 @@ pub trait TimeoutState {
 }
 
 pub trait TickInstant: Copy {
+    fn frequency() -> KilohertzU32;
     fn now() -> Self;
     /// Returns the amount of ticks elapsed from another instant to this one.
     fn tick_since(self, earlier: Self) -> u32;

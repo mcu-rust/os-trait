@@ -12,11 +12,15 @@ impl FakeNotifier {
 }
 
 impl Notifier for FakeNotifier {
-    fn notify(&self) {}
+    fn notify(&self) -> bool {
+        true
+    }
 }
 
 impl NotifierIsr for FakeNotifier {
-    fn notify_from_isr(&self) {}
+    fn notify_from_isr(&self) -> bool {
+        true
+    }
 }
 
 impl NotifyWaiter for FakeNotifier {
@@ -47,14 +51,16 @@ impl<OS: OsInterface> AtomicNotifier<OS> {
 }
 
 impl<OS: OsInterface> Notifier for AtomicNotifier<OS> {
-    fn notify(&self) {
-        self.flag.store(true, Ordering::Release)
+    fn notify(&self) -> bool {
+        self.flag.store(true, Ordering::Release);
+        true
     }
 }
 
 impl<OS: OsInterface> NotifierIsr for AtomicNotifier<OS> {
-    fn notify_from_isr(&self) {
-        self.flag.store(true, Ordering::Release)
+    fn notify_from_isr(&self) -> bool {
+        self.flag.store(true, Ordering::Release);
+        true
     }
 }
 
@@ -66,7 +72,7 @@ pub struct AtomicNotifyReceiver<OS> {
 impl<OS: OsInterface> NotifyWaiter for AtomicNotifyReceiver<OS> {
     fn wait(&self, timeout: MicrosDurationU32) -> bool {
         let tm = OS::timeout();
-        let mut t = tm.start_us(timeout.ticks());
+        let mut t = tm.start_us(timeout.to_micros());
         while !t.timeout() {
             if self
                 .flag
@@ -112,14 +118,16 @@ mod std_impl {
     }
 
     impl Notifier for StdNotifier {
-        fn notify(&self) {
-            self.flag.store(true, Ordering::Release)
+        fn notify(&self) -> bool {
+            self.flag.store(true, Ordering::Release);
+            true
         }
     }
 
     impl NotifierIsr for StdNotifier {
-        fn notify_from_isr(&self) {
-            self.flag.store(true, Ordering::Release)
+        fn notify_from_isr(&self) -> bool {
+            self.flag.store(true, Ordering::Release);
+            true
         }
     }
 
@@ -131,7 +139,7 @@ mod std_impl {
     impl NotifyWaiter for StdNotifyWaiter {
         fn wait(&self, timeout: MicrosDurationU32) -> bool {
             let now = Instant::now();
-            while now.elapsed().as_micros() < timeout.ticks().into() {
+            while now.elapsed().as_micros() < timeout.to_micros().into() {
                 if self
                     .flag
                     .compare_exchange(true, false, Ordering::SeqCst, Ordering::Acquire)

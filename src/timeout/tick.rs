@@ -2,7 +2,6 @@ use super::*;
 use core::marker::PhantomData;
 
 pub struct TickTimeoutNs<T> {
-    frequency: u32,
     _t: PhantomData<T>,
 }
 
@@ -10,11 +9,8 @@ impl<T> TickTimeoutNs<T>
 where
     T: TickInstant,
 {
-    pub fn new(frequency: u32) -> Self {
-        Self {
-            frequency,
-            _t: PhantomData,
-        }
+    pub fn new() -> Self {
+        Self { _t: PhantomData }
     }
 }
 
@@ -24,17 +20,17 @@ where
 {
     #[inline]
     fn start_ns(&self, timeout: u32) -> impl TimeoutState {
-        TickTimeoutState::<T>::new_ns(self.frequency, timeout)
+        TickTimeoutState::<T>::new_ns(timeout)
     }
 
     #[inline]
     fn start_us(&self, timeout: u32) -> impl TimeoutState {
-        TickTimeoutState::<T>::new_us(self.frequency, timeout)
+        TickTimeoutState::<T>::new_us(timeout)
     }
 
     #[inline]
     fn start_ms(&self, timeout: u32) -> impl TimeoutState {
-        TickTimeoutState::<T>::new_ms(self.frequency, timeout)
+        TickTimeoutState::<T>::new_ms(timeout)
     }
 }
 
@@ -48,9 +44,9 @@ impl<T> TickTimeoutState<T>
 where
     T: TickInstant,
 {
-    pub fn new_ns(frequency: u32, timeout: u32) -> Self {
+    pub fn new_ns(timeout: u32) -> Self {
         let ns = timeout as u64;
-        let timeout_tick = (ns * frequency as u64).div_ceil(1_000_000_000);
+        let timeout_tick = (ns * T::frequency().to_Hz() as u64).div_ceil(1_000_000_000);
         assert!(timeout_tick <= u32::MAX as u64);
         Self {
             tick: T::now(),
@@ -59,8 +55,9 @@ where
         }
     }
 
-    pub fn new_us(frequency: u32, timeout: u32) -> Self {
+    pub fn new_us(timeout: u32) -> Self {
         let us = timeout;
+        let frequency = T::frequency().to_Hz();
         let timeout_tick = if frequency >= 1_000_000 {
             us.checked_mul(frequency / 1_000_000).unwrap()
         } else if frequency >= 1_000 {
@@ -76,8 +73,9 @@ where
         }
     }
 
-    pub fn new_ms(frequency: u32, timeout: u32) -> Self {
+    pub fn new_ms(timeout: u32) -> Self {
         let ms = timeout;
+        let frequency = T::frequency().to_Hz();
         let timeout_tick = if frequency >= 1_000 {
             ms.checked_mul(frequency / 1_000).unwrap()
         } else {
@@ -140,7 +138,9 @@ impl Num for u64 {
 #[cfg(test)]
 mod tests {
     use core::ops::Div;
-    use fugit::{ExtU32, ExtU32Ceil, MicrosDurationU32, MillisDurationU32};
+    use fugit::{
+        ExtU32, ExtU32Ceil, KilohertzU32, MicrosDurationU32, MillisDurationU32, RateExtU32,
+    };
 
     #[test]
     fn duration_tick() {
@@ -157,6 +157,7 @@ mod tests {
 
         let dur: MillisDurationU32 = 1.millis();
         assert_eq!(dur.ticks(), 1);
+        assert_eq!(dur.to_micros(), 1000);
 
         let dur: MillisDurationU32 = 1.micros();
         assert_eq!(dur.ticks(), 0);
@@ -168,5 +169,13 @@ mod tests {
         assert_eq!(dur.to_millis(), 0);
         let dur: MillisDurationU32 = dur.ticks().micros_at_least();
         assert_eq!(dur.ticks(), 1);
+    }
+
+    #[test]
+    fn rate_tick() {
+        let r: KilohertzU32 = 1.MHz();
+        assert_eq!(r.raw(), 1_000);
+        let f: u32 = r.to_Hz();
+        assert_eq!(f, 1_000_000);
     }
 }

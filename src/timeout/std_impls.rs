@@ -1,4 +1,5 @@
 use super::*;
+use fugit::RateExtU32;
 use std::time::{Duration, Instant};
 
 /// [`TimeoutNs`] implementation.
@@ -52,6 +53,10 @@ impl TimeoutState for StdTimeoutState {
 }
 
 impl TickInstant for Instant {
+    fn frequency() -> KilohertzU32 {
+        1.MHz()
+    }
+
     #[inline(always)]
     fn now() -> Self {
         Instant::now()
@@ -95,7 +100,7 @@ mod tests {
 
     #[test]
     fn tick_timeout() {
-        let timeout = TickTimeoutNs::<Instant>::new(1_000_000);
+        let timeout = TickTimeoutNs::<Instant>::new();
         test_timeout(timeout);
     }
 

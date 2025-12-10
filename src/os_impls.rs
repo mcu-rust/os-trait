@@ -51,11 +51,11 @@ impl OsInterface for FakeOs {
     fn yield_thread() {}
 
     fn delay() -> impl DelayNs {
-        TickDelay::<FakeInstant>::new(1)
+        TickDelay::<FakeInstant>::new()
     }
 
     fn timeout() -> impl TimeoutNs {
-        FakeTimeoutNs::new(1)
+        FakeTimeoutNs::new()
     }
 
     fn notifier_isr() -> (impl NotifierIsr, impl NotifyWaiter) {

@@ -1,8 +1,7 @@
-use core::cell::Cell;
-
-use crate::tick::{TickTimeoutNs, TickTimeoutState};
-
 use super::*;
+use crate::tick::{TickTimeoutNs, TickTimeoutState};
+use core::cell::Cell;
+use fugit::RateExtU32;
 
 pub type FakeTimeoutNs = TickTimeoutNs<FakeInstant>;
 pub type FakeTimeoutState = TickTimeoutState<FakeInstant>;
@@ -15,6 +14,10 @@ pub struct FakeInstant {
 }
 
 impl TickInstant for FakeInstant {
+    fn frequency() -> KilohertzU32 {
+        1.kHz()
+    }
+
     fn now() -> Self {
         critical_section::with(|cs| {
             let c = COUNTER.borrow(cs).get() + 1;
