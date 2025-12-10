@@ -7,7 +7,6 @@ pub use fake_impls::*;
 pub use fugit::KilohertzU32;
 
 pub trait TimeoutNs {
-    /// Set timeout.
     fn start_ns(&self, timeout: u32) -> impl TimeoutState;
     fn start_us(&self, timeout: u32) -> impl TimeoutState;
     fn start_ms(&self, timeout: u32) -> impl TimeoutState;
