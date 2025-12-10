@@ -2,7 +2,7 @@ use crate::{notifier::*, *};
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct FakeNotifier;
 
 impl NotifyBuilder for FakeNotifier {
@@ -38,6 +38,15 @@ impl NotifyWaiter for FakeNotifier {
 pub struct AtomicNotifier<OS> {
     flag: Arc<AtomicBool>,
     _os: PhantomData<OS>,
+}
+
+impl<OS: OsInterface> Clone for AtomicNotifier<OS> {
+    fn clone(&self) -> Self {
+        Self {
+            flag: Arc::clone(&self.flag),
+            _os: PhantomData,
+        }
+    }
 }
 
 impl<OS: OsInterface> AtomicNotifier<OS> {
@@ -115,6 +124,7 @@ mod std_impl {
     use std::time::Instant;
 
     /// This implementation is only for unit testing.
+    #[derive(Clone)]
     pub struct StdNotifier {
         flag: Arc<AtomicBool>,
     }
@@ -181,6 +191,7 @@ mod std_impl {
     mod tests {
         use super::*;
         use fugit::ExtU32;
+        use std::thread;
 
         #[test]
         fn notify() {
@@ -188,6 +199,27 @@ mod std_impl {
             assert!(!w.wait(1.millis()));
             n.notify();
             assert!(w.wait(1.millis()));
+
+            let mut handles = vec![];
+
+            let n2 = n.clone();
+
+            handles.push(thread::spawn(move || {
+                assert!(w.wait(100.millis()));
+                assert!(w.wait(100.millis()));
+            }));
+
+            handles.push(thread::spawn(move || {
+                assert!(n.notify());
+            }));
+
+            handles.push(thread::spawn(move || {
+                assert!(n2.notify());
+            }));
+
+            for h in handles {
+                h.join().unwrap();
+            }
         }
     }
 }

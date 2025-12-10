@@ -5,7 +5,7 @@ pub trait NotifyBuilder {
     fn build_isr() -> (impl NotifierIsr, impl NotifyWaiter);
 }
 
-pub trait NotifierIsr: Send + Sync {
+pub trait NotifierIsr: Send + Clone {
     fn notify_from_isr(&self) -> bool;
 }
 
