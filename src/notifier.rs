@@ -14,12 +14,16 @@ pub trait NotifyWaiter: Send {
     fn wait(&self, timeout: MicrosDurationU32) -> bool;
 
     /// # Parameters
-    /// - `timeout` Total timeout.
-    /// - `count` How many times to split the total timeout.
+    /// - `timeout`: Total timeout.
+    /// - `count`: How many times to split the total timeout.
     ///   Your function will be called after each small timeout.
     ///   It's useful when you want to check something while it's waiting.
     ///   If you’re not sure, set it to `1`. Do **NOT** set it to `0`.
     /// - `f`: Your function. If it returns `Some()`, it will break out of the wait.
+    ///
+    /// # Returns
+    /// - `None`: It's timeout.
+    /// - `Some(x)`: The value returned by your function.
     #[inline]
     fn wait_with<U>(
         &self,
