@@ -2,13 +2,10 @@ use crate::fugit::MicrosDurationU32;
 
 pub trait NotifyBuilder {
     fn build() -> (impl Notifier, impl NotifyWaiter);
-    fn build_isr() -> (impl NotifierIsr, impl NotifyWaiter);
 }
 
-pub trait NotifierIsr: Send + Clone {
-    fn notify_from_isr(&self) -> bool;
-}
-
+/// This method should be able to call from task or ISR.
+/// The implementation should handle the different situations.
 pub trait Notifier: Send + Sync {
     fn notify(&self) -> bool;
 }

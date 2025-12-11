@@ -71,10 +71,6 @@ mod tests {
         OS::yield_thread();
         OS::delay().delay_ms(1);
 
-        let (n, r) = OS::notifier_isr();
-        n.notify_from_isr();
-        assert!(r.wait(1.millis()));
-
         let (n, r) = OS::notifier();
         n.notify();
         assert!(r.wait(1.millis()));

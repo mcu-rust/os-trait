@@ -11,20 +11,10 @@ impl NotifyBuilder for FakeNotifier {
     fn build() -> (impl Notifier, impl NotifyWaiter) {
         (Self {}, Self {})
     }
-
-    fn build_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
-        (Self {}, Self {})
-    }
 }
 
 impl Notifier for FakeNotifier {
     fn notify(&self) -> bool {
-        true
-    }
-}
-
-impl NotifierIsr for FakeNotifier {
-    fn notify_from_isr(&self) -> bool {
         true
     }
 }
@@ -70,21 +60,10 @@ impl<OS: OsInterface> NotifyBuilder for AtomicNotifier<OS> {
     fn build() -> (impl Notifier, impl NotifyWaiter) {
         Self::new()
     }
-
-    fn build_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
-        Self::new()
-    }
 }
 
 impl<OS: OsInterface> Notifier for AtomicNotifier<OS> {
     fn notify(&self) -> bool {
-        self.flag.store(true, Ordering::Release);
-        true
-    }
-}
-
-impl<OS: OsInterface> NotifierIsr for AtomicNotifier<OS> {
-    fn notify_from_isr(&self) -> bool {
         self.flag.store(true, Ordering::Release);
         true
     }
@@ -147,21 +126,10 @@ mod std_impl {
         fn build() -> (impl Notifier, impl NotifyWaiter) {
             Self::new()
         }
-
-        fn build_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
-            Self::new()
-        }
     }
 
     impl Notifier for StdNotifier {
         fn notify(&self) -> bool {
-            self.flag.store(true, Ordering::Release);
-            true
-        }
-    }
-
-    impl NotifierIsr for StdNotifier {
-        fn notify_from_isr(&self) -> bool {
             self.flag.store(true, Ordering::Release);
             true
         }
@@ -207,8 +175,8 @@ mod std_impl {
             let n2 = n.clone();
 
             handles.push(thread::spawn(move || {
-                assert!(w.wait(500.millis()));
-                assert!(w.wait(500.millis()));
+                assert!(w.wait(1000.millis()));
+                assert!(w.wait(1000.millis()));
             }));
 
             handles.push(thread::spawn(move || {

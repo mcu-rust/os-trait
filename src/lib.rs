@@ -64,11 +64,6 @@ pub trait OsInterface: Send + Sync {
     }
 
     #[inline]
-    fn notifier_isr() -> (impl NotifierIsr, impl NotifyWaiter) {
-        Self::NotifyBuilder::build_isr()
-    }
-
-    #[inline]
     fn notifier() -> (impl Notifier, impl NotifyWaiter) {
         Self::NotifyBuilder::build()
     }
