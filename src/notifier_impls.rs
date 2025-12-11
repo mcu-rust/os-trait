@@ -165,6 +165,16 @@ mod std_impl {
             handles.push(thread::spawn(move || {
                 assert!(w.wait(1000.millis()));
                 assert!(w.wait(1000.millis()));
+
+                let mut i = 0;
+                assert_eq!(
+                    w.wait_with(100.millis(), 4, || {
+                        i += 1;
+                        None::<()>
+                    }),
+                    None
+                );
+                assert_eq!(i, 5);
             }));
 
             handles.push(thread::spawn(move || {
