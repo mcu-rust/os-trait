@@ -22,6 +22,10 @@ impl OsInterface for StdOs {
     type NotifyWaiter = StdNotifyWaiter;
     type Timeout = StdTimeoutNs;
 
+    fn os() -> Self {
+        Self {}
+    }
+
     #[inline]
     fn yield_thread() {
         thread::yield_now();
@@ -46,6 +50,10 @@ impl OsInterface for FakeOs {
     type Notifier = FakeNotifier;
     type NotifyWaiter = FakeNotifier;
     type Timeout = FakeTimeoutNs;
+
+    fn os() -> Self {
+        Self {}
+    }
 
     #[inline]
     fn yield_thread() {}
