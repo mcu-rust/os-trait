@@ -4,11 +4,11 @@ use core::{
     sync::atomic::{AtomicBool, Ordering},
 };
 
-#[derive(Default, Clone)]
+#[derive(Clone)]
 pub struct FakeNotifier;
 
-impl NotifyBuilder for FakeNotifier {
-    fn build() -> (impl Notifier, impl NotifyWaiter) {
+impl FakeNotifier {
+    pub fn new() -> (Self, Self) {
         (Self {}, Self {})
     }
 }
@@ -43,22 +43,16 @@ impl<OS: OsInterface> Clone for AtomicNotifier<OS> {
 }
 
 impl<OS: OsInterface> AtomicNotifier<OS> {
-    pub fn new() -> (Self, impl NotifyWaiter) {
+    pub fn new() -> (Self, AtomicNotifyWaiter<OS>) {
         let s = Self {
             flag: Arc::new(AtomicBool::new(false)),
             _os: PhantomData,
         };
-        let r = AtomicNotifyReceiver::<OS> {
+        let r = AtomicNotifyWaiter::<OS> {
             flag: Arc::clone(&s.flag),
             _os: PhantomData,
         };
         (s, r)
-    }
-}
-
-impl<OS: OsInterface> NotifyBuilder for AtomicNotifier<OS> {
-    fn build() -> (impl Notifier, impl NotifyWaiter) {
-        Self::new()
     }
 }
 
@@ -69,12 +63,12 @@ impl<OS: OsInterface> Notifier for AtomicNotifier<OS> {
     }
 }
 
-pub struct AtomicNotifyReceiver<OS> {
+pub struct AtomicNotifyWaiter<OS> {
     flag: Arc<AtomicBool>,
     _os: PhantomData<OS>,
 }
 
-impl<OS: OsInterface> NotifyWaiter for AtomicNotifyReceiver<OS> {
+impl<OS: OsInterface> NotifyWaiter for AtomicNotifyWaiter<OS> {
     fn wait(&self, timeout: MicrosDurationU32) -> bool {
         let mut t = OS::Timeout::start_us(timeout.to_micros());
         while !t.timeout() {
@@ -119,12 +113,6 @@ mod std_impl {
                 flag: Arc::clone(&s.flag),
             };
             (s, r)
-        }
-    }
-
-    impl NotifyBuilder for StdNotifier {
-        fn build() -> (impl Notifier, impl NotifyWaiter) {
-            Self::new()
         }
     }
 
