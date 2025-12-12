@@ -8,7 +8,7 @@
     name = "os-trait"
     readme = "README.md"
     repository = "https://github.com/mcu-rust/os-trait"
-    version = "0.3.4"
+    version = "0.3.5"
 
 
     [package.metadata.docs.rs]
