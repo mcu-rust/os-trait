@@ -22,9 +22,7 @@ impl OsInterface for StdOs {
     type NotifyWaiter = StdNotifyWaiter;
     type Timeout = StdTimeoutNs;
 
-    fn os() -> Self {
-        Self {}
-    }
+    const O: Self = Self {};
 
     #[inline]
     fn yield_thread() {
@@ -51,9 +49,7 @@ impl OsInterface for FakeOs {
     type NotifyWaiter = FakeNotifier;
     type Timeout = FakeTimeoutNs;
 
-    fn os() -> Self {
-        Self {}
-    }
+    const O: Self = Self {};
 
     #[inline]
     fn yield_thread() {}
@@ -105,6 +101,8 @@ mod tests {
 
             OS::yield_thread();
             OS::delay().delay_ms(1);
+
+            let _os = OS::O;
 
             assert!(self.notifier.notify());
             assert!(self.waiter.wait(1.millis()));

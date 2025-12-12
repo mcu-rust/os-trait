@@ -57,7 +57,8 @@ pub trait OsInterface: Send + Sync {
     type Timeout: TimeoutNs;
 
     /// Used for generics functions.
-    fn os() -> Self;
+    const O: Self;
+
     fn yield_thread();
     fn delay() -> impl DelayNs;
     fn notify() -> (Self::Notifier, Self::NotifyWaiter);

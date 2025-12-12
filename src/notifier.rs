@@ -17,7 +17,7 @@ pub trait NotifyWaiter: Send {
 
     /// # Description
     /// Wait for a notification, but it can split the total timeout into small timeout.
-    /// Your function will be called after each small timeout.
+    /// Your function will be called once immediately and after each small timeout.
     /// It's useful when you want to check something while it's waiting.
     ///
     /// # Parameters
@@ -33,7 +33,7 @@ pub trait NotifyWaiter: Send {
     /// # Note
     /// It may call your function more times than expected and wait longer than expected.
     #[inline]
-    fn wait_with<U, OS: OsInterface>(
+    fn wait_with<OS: OsInterface, U>(
         &self,
         _os: OS,
         timeout: MicrosDurationU32,

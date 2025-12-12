@@ -168,7 +168,7 @@ mod std_impl {
 
                 let mut i = 0;
                 assert_eq!(
-                    w.wait_with(StdOs::os(), 100.millis(), 4, || {
+                    w.wait_with(StdOs::O, 100.millis(), 4, || {
                         i += 1;
                         None::<()>
                     }),
