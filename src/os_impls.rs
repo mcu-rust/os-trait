@@ -76,12 +76,17 @@ mod tests {
     struct OsUser<OS: OsInterface> {
         notifier: OS::Notifier,
         waiter: OS::NotifyWaiter,
+        mutex: Mutex<OS, u8>,
     }
 
     impl<OS: OsInterface> OsUser<OS> {
         fn new() -> Self {
             let (notifier, waiter) = OS::notify();
-            Self { notifier, waiter }
+            Self {
+                notifier,
+                waiter,
+                mutex: OS::mutex(1),
+            }
         }
 
         fn use_os(&mut self) {
@@ -106,6 +111,9 @@ mod tests {
 
             assert!(self.notifier.notify());
             assert!(self.waiter.wait(1.millis()));
+
+            let mut d = self.mutex.lock();
+            *d = 2;
         }
     }
 
