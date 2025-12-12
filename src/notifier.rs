@@ -4,7 +4,7 @@ use crate::{OsInterface, TimeoutNs, fugit::MicrosDurationU32};
 
 /// This method should be able to call from task or ISR.
 /// The implementation should handle the different situations.
-pub trait Notifier: Send + Sync {
+pub trait Notifier: Send + Clone {
     fn notify(&self) -> bool;
 }
 
