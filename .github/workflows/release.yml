@@ -18,6 +18,14 @@ jobs:
       id-token: write # Required for OIDC token exchange
     steps:
       - uses: actions/checkout@v6
+      - name: Cache .cargo and target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo
+            ./target
+          key: cargo-${{ runner.os }}
       - uses: dtolnay/rust-toolchain@stable
       - uses: rust-lang/crates-io-auth-action@v1
         id: auth
