@@ -56,7 +56,7 @@ pub trait OsInterface: Send + Sync + 'static {
     type NotifyWaiter: NotifyWaiter;
     type Timeout: TimeoutNs;
 
-    /// Used for generics functions.
+    /// It's used to avoid writing `foo::<OS, _, _, _>(...)`
     const O: Self;
 
     fn yield_thread();
