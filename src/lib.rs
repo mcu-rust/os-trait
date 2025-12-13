@@ -50,7 +50,7 @@ extern crate alloc;
 ///     os_interface::<StdOs>();
 /// }
 /// ```
-pub trait OsInterface: Send + Sync {
+pub trait OsInterface: Send + Sync + 'static {
     type RawMutex: ConstInit + RawMutex;
     type Notifier: Notifier;
     type NotifyWaiter: NotifyWaiter;
