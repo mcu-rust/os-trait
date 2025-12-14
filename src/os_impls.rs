@@ -22,6 +22,7 @@ impl OsInterface for StdOs {
     type NotifyWaiter = StdNotifyWaiter;
     type Timeout = StdTimeoutNs;
     type TimeoutState = StdTimeoutState;
+    type DelayNs = StdDelayNs;
 
     const O: Self = Self {};
 
@@ -31,7 +32,7 @@ impl OsInterface for StdOs {
     }
 
     #[inline]
-    fn delay() -> impl DelayNs {
+    fn delay() -> Self::DelayNs {
         StdDelayNs {}
     }
 
@@ -50,6 +51,7 @@ impl OsInterface for FakeOs {
     type NotifyWaiter = FakeNotifier;
     type Timeout = FakeTimeoutNs;
     type TimeoutState = FakeTimeoutState;
+    type DelayNs = TickDelay<FakeInstant>;
 
     const O: Self = Self {};
 
@@ -57,7 +59,7 @@ impl OsInterface for FakeOs {
     fn yield_thread() {}
 
     #[inline]
-    fn delay() -> impl DelayNs {
+    fn delay() -> Self::DelayNs {
         TickDelay::<FakeInstant>::default()
     }
 
