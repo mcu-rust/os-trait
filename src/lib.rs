@@ -60,6 +60,12 @@ pub trait OsInterface: Send + Sync + 'static {
     const O: Self;
 
     fn yield_thread();
+
+    #[inline(always)]
+    fn yield_task() {
+        Self::yield_thread()
+    }
+
     fn delay() -> impl DelayNs;
     fn notify() -> (Self::Notifier, Self::NotifyWaiter);
 
