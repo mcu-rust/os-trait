@@ -54,7 +54,8 @@ pub trait OsInterface: Send + Sync + 'static {
     type RawMutex: ConstInit + RawMutex;
     type Notifier: Notifier;
     type NotifyWaiter: NotifyWaiter;
-    type Timeout: TimeoutNs;
+    type Timeout: TimeoutNs<TimeoutState = Self::TimeoutState>;
+    type TimeoutState: TimeoutState;
 
     /// It's used to avoid writing `foo::<OS, _, _, _>(...)`
     const O: Self;

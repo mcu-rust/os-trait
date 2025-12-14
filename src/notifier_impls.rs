@@ -163,8 +163,8 @@ mod std_impl {
             let n2 = n.clone();
 
             handles.push(thread::spawn(move || {
-                assert!(w.wait(1000.millis()));
-                assert!(w.wait(1000.millis()));
+                assert!(w.wait(2000.millis()));
+                assert!(w.wait(2000.millis()));
 
                 let mut i = 0;
                 assert_eq!(

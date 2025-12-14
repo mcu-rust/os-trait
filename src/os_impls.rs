@@ -21,6 +21,7 @@ impl OsInterface for StdOs {
     type Notifier = StdNotifier;
     type NotifyWaiter = StdNotifyWaiter;
     type Timeout = StdTimeoutNs;
+    type TimeoutState = StdTimeoutState;
 
     const O: Self = Self {};
 
@@ -48,6 +49,7 @@ impl OsInterface for FakeOs {
     type Notifier = FakeNotifier;
     type NotifyWaiter = FakeNotifier;
     type Timeout = FakeTimeoutNs;
+    type TimeoutState = FakeTimeoutState;
 
     const O: Self = Self {};
 
@@ -77,6 +79,7 @@ mod tests {
         notifier: OS::Notifier,
         waiter: OS::NotifyWaiter,
         mutex: Mutex<OS, u8>,
+        interval: OS::TimeoutState,
     }
 
     impl<OS: OsInterface> OsUser<OS> {
@@ -86,6 +89,7 @@ mod tests {
                 notifier,
                 waiter,
                 mutex: OS::mutex(1),
+                interval: OS::Timeout::start_ms(1),
             }
         }
 
@@ -114,6 +118,8 @@ mod tests {
 
             let mut d = self.mutex.lock();
             *d = 2;
+
+            self.interval.timeout();
         }
     }
 

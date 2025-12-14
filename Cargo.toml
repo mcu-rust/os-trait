@@ -26,4 +26,4 @@
     fugit = "0.3"
     mutex = "1"
     mutex-traits = "1"
-    timeout-trait = "0.1"
+    timeout-trait = "0.2"
