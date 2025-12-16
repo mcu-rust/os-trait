@@ -1,4 +1,9 @@
 # os-trait
+
+[![CI](https://github.com/mcu-rust/os-trait/workflows/CI/badge.svg)](https://github.com/mcu-rust/os-trait/actions)
+[![Crates.io](https://img.shields.io/crates/v/os-trait.svg)](https://crates.io/crates/os-trait)
+[![Downloads](https://img.shields.io/crates/d/os-trait.svg)](https://crates.io/crates/os-trait)
+
 Traits used to adapter different embedded RTOS.
 
 
