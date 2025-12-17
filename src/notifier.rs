@@ -42,7 +42,7 @@ pub trait NotifyWaiter: Send {
     ) -> Option<U> {
         assert!(count > 0);
         let wait_t = MicrosDurationU32::from_ticks(timeout.ticks() / count);
-        let mut t = OS::Timeout::start_us(timeout.ticks());
+        let mut t = OS::timeout().start_us(timeout.ticks());
         loop {
             if let Some(rst) = f() {
                 return Some(rst);

@@ -70,7 +70,7 @@ pub struct AtomicNotifyWaiter<OS> {
 
 impl<OS: OsInterface> NotifyWaiter for AtomicNotifyWaiter<OS> {
     fn wait(&self, timeout: MicrosDurationU32) -> bool {
-        let mut t = OS::Timeout::start_us(timeout.to_micros());
+        let mut t = OS::timeout().start_us(timeout.to_micros());
         while !t.timeout() {
             if self
                 .flag

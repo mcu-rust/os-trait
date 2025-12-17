@@ -56,7 +56,7 @@ pub trait OsInterface: Send + Sync + 'static {
     type NotifyWaiter: NotifyWaiter;
     type Timeout: TimeoutNs<TimeoutState = Self::TimeoutState>;
     type TimeoutState: TimeoutState;
-    type DelayNs: DelayNs;
+    type Delay: DelayNs;
 
     /// It's used to avoid writing `foo::<OS, _, _, _>(...)`
     const O: Self;
@@ -68,7 +68,8 @@ pub trait OsInterface: Send + Sync + 'static {
         Self::yield_thread()
     }
 
-    fn delay() -> Self::DelayNs;
+    fn timeout() -> Self::Timeout;
+    fn delay() -> Self::Delay;
     fn notify() -> (Self::Notifier, Self::NotifyWaiter);
 
     #[inline]
