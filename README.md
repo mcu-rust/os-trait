@@ -5,9 +5,8 @@
 [![Downloads](https://img.shields.io/crates/d/os-trait.svg)](https://crates.io/crates/os-trait)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](./LICENSE)
 
-
-**A unified trait layer for adapting multiple RTOS implementations to embedded Rust HALs.**  
-`os-trait` makes embedded Rust code more portable, testable, and OS‑agnostic by standardizing common OS primitives such as mutexes, delays, timeouts, and thread yielding.
+**`os-trait` provides a unified trait layer for adapting multiple RTOS implementations to embedded Rust HALs.**
+It makes embedded Rust code more portable, testable, and OS‑agnostic by standardizing common OS primitives such as mutexes, delays, timeouts, and thread yielding.
 
 This crate integrates with several foundational components of the embedded Rust ecosystem:
 
@@ -114,4 +113,5 @@ Contributions and ideas are welcome!
 ## 🔖 Keywords (for GitHub & crates.io SEO)
 
 embedded rust · rtos · hal · mutex · delay · timeout · portability · no_std · embedded-hal · traits
+
 
