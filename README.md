@@ -8,18 +8,13 @@
 **`os-trait` provides a unified trait layer for adapting multiple RTOS implementations to embedded Rust HALs.**
 It makes embedded Rust code more portable, testable, and OS‑agnostic by standardizing common OS primitives such as mutexes, delays, timeouts, notifier, and thread yielding.
 
----
-
 This crate integrates with several foundational components of the embedded Rust ecosystem:
 
 - [`timeout-trait`](https://crates.io/crates/timeout-trait) — timeout abstractions  
 - [`embedded-hal`](https://crates.io/crates/embedded-hal) — uses the `DelayNs` trait  
 - [`mutex`](https://crates.io/crates/mutex) — uses `BlockingMutex` and `RawMutex`  
 
----
-
-## 🚀 Usage
-
+## 📦 Usage
 
 ```sh
 cargo add os-trait
@@ -58,8 +53,6 @@ fn select_os() {
 | `std`               | ❌      | Enables `std` for unit testing                                              |
 | `std-custom-mutex`  | ❌      | Use `BlockingMutex` instead of `std::sync::Mutex` in `std` environments     |
 
----
-
 ## 🧩 Implementing Your Own OS
 
 To integrate your own RTOS or execution environment, implement the `OsInterface` trait and provide:
@@ -74,12 +67,10 @@ Once implemented, your OS becomes compatible with any HAL or driver that depends
 For a full implementation example, see [os_trait_impls.rs](https://github.com/mcu-rust/FreeRTOS/blob/main/freertos/src/os_trait_impls.rs).  
 Additional examples are available in [os_impls.rs](src/os_impls.rs).
 
----
-
 ## 🔖 Keywords
 
-
 embedded rust · rtos · hal · mutex · delay · timeout · portability · no_std · embedded-hal · traits
+
 
 
 
