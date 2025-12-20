@@ -6,7 +6,8 @@
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](./LICENSE)
 
 **`os-trait` provides a unified trait layer for adapting multiple RTOS implementations to embedded Rust HALs.**
-It makes embedded Rust code more portable, testable, and OS‑agnostic by standardizing common OS primitives such as mutexes, delays, timeouts, and thread yielding.
+It makes embedded Rust code more portable, testable, and OS‑agnostic by standardizing common OS primitives such as mutexes, delays, timeouts, notifier, and thread yielding.
+
 
 This crate integrates with several foundational components of the embedded Rust ecosystem:
 
