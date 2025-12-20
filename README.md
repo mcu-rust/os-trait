@@ -100,13 +100,6 @@ Once implemented, your OS becomes compatible with any HAL or driver that depends
 
 ---
 
-## 🛣️ Roadmap
-
-- Additional built‑in OS adapters  
-- More examples and integration tests  
-- Exploration of optional async support  
-
-Contributions and ideas are welcome!
 
 ---
 
