@@ -35,7 +35,8 @@ Instead of writing custom glue code for each OS, `os-trait` defines a **common i
 
 ---
 
-## 🚀 Installation
+## 🚀 Usage
+
 
 ```sh
 cargo add os-trait
