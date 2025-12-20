@@ -8,30 +8,13 @@
 **`os-trait` provides a unified trait layer for adapting multiple RTOS implementations to embedded Rust HALs.**
 It makes embedded Rust code more portable, testable, and OS‑agnostic by standardizing common OS primitives such as mutexes, delays, timeouts, notifier, and thread yielding.
 
+---
 
 This crate integrates with several foundational components of the embedded Rust ecosystem:
 
 - [`timeout-trait`](https://crates.io/crates/timeout-trait) — timeout abstractions  
 - [`embedded-hal`](https://crates.io/crates/embedded-hal) — uses the `DelayNs` trait  
 - [`mutex`](https://crates.io/crates/mutex) — uses `BlockingMutex` and `RawMutex`  
-
----
-
-## ✨ Overview
-
-Embedded Rust developers often need to support multiple RTOSes—or no RTOS at all. HALs and drivers typically require:
-
-- A delay provider  
-- A mutex implementation  
-- A timeout mechanism  
-- A way to yield execution  
-
-Instead of writing custom glue code for each OS, `os-trait` defines a **common interface** that any OS can implement. This enables:
-
-- Portable drivers  
-- Cleaner HAL integrations  
-- Easier unit testing  
-- Reduced OS‑specific boilerplate  
 
 ---
 
@@ -66,7 +49,7 @@ fn select_os() {
     use_os::<StdOs>();
 }
 ```
-More examples can be found in [os_impls.rs](src/os_impls.rs).
+
 ## ⚙️ Cargo Features
 
 | Feature             | Default | Description                                                                 |
@@ -88,20 +71,8 @@ To integrate your own RTOS or execution environment, implement the `OsInterface`
 
 Once implemented, your OS becomes compatible with any HAL or driver that depends on `os-trait`.
 
----
-
-## 🌐 Ecosystem Compatibility
-
-`os-trait` works well with:
-
-- Embedded HAL drivers  
-- No‑std environments  
-- RTOSes such as FreeRTOS, RTIC, Zephyr (via custom adapters)  
-- Unit testing environments using `StdOs`  
-- Bare‑metal testing using `FakeOs`  
-
----
-
+For a full implementation example, see [os_trait_impls.rs](https://github.com/mcu-rust/FreeRTOS/blob/main/freertos/src/os_trait_impls.rs).  
+Additional examples are available in [os_impls.rs](src/os_impls.rs).
 
 ---
 
@@ -109,5 +80,6 @@ Once implemented, your OS becomes compatible with any HAL or driver that depends
 
 
 embedded rust · rtos · hal · mutex · delay · timeout · portability · no_std · embedded-hal · traits
+
 
 
