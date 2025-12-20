@@ -2,8 +2,10 @@
 
 [![CI](https://github.com/mcu-rust/os-trait/workflows/CI/badge.svg)](https://github.com/mcu-rust/os-trait/actions)
 [![Crates.io](https://img.shields.io/crates/v/os-trait.svg)](https://crates.io/crates/os-trait)
-[![Downloads](https://img.shields.io/crates/d/os-trait.svg)](https://crates.io/crates/os-trait)
+[![Docs.rs](https://docs.rs/os-trait/badge.svg)](https://docs.rs/os-trait)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](./LICENSE)
+[![Downloads](https://img.shields.io/crates/d/os-trait.svg)](https://crates.io/crates/os-trait)
+
 
 **`os-trait` provides a unified trait layer for adapting multiple RTOS implementations to embedded Rust HALs.**
 It makes embedded Rust code more portable, testable, and OS‑agnostic by standardizing common OS primitives such as mutexes, delays, timeouts, notifier, and thread yielding.
@@ -70,6 +72,7 @@ Additional examples are available in [os_impls.rs](src/os_impls.rs).
 ## 🔖 Keywords
 
 embedded rust · rtos · hal · mutex · delay · timeout · portability · no_std · embedded-hal · traits
+
 
 
 
