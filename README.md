@@ -110,7 +110,8 @@ Contributions and ideas are welcome!
 
 ---
 
-## 🔖 Keywords (for GitHub & crates.io SEO)
+## 🔖 Keywords
+
 
 embedded rust · rtos · hal · mutex · delay · timeout · portability · no_std · embedded-hal · traits
 
