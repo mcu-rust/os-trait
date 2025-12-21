@@ -66,8 +66,9 @@ To integrate your own RTOS or execution environment, implement the `OsInterface`
 
 Once implemented, your OS becomes compatible with any HAL or driver that depends on `os-trait`.
 
-For a full implementation example, see [os_trait_impls.rs](https://github.com/mcu-rust/FreeRTOS/blob/main/freertos/src/os_trait_impls.rs).  
-Additional examples are available in [os_impls.rs](src/os_impls.rs).
+For a full implementation example, see [os_trait_impls.rs for FreeRTOS](https://github.com/mcu-rust/FreeRTOS/blob/main/freertos/src/os_trait_impls.rs).  
+Basic examples are available in [os_impls.rs](src/os_impls.rs).
+
 
 ## 🔖 Keywords
 
