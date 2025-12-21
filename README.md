@@ -57,12 +57,12 @@ fn select_os() {
 
 ## 🧩 Implementing Your Own OS
 
-To integrate your own RTOS or execution environment, implement the `OsInterface` trait and provide:
-
-- A mutex type  
-- A delay provider  
-- A timeout provider  
-- A thread‑yielding mechanism  
+Implement the `OsInterface` trait and provide:
+- A `RawMutex` implementation
+- A `Notifier` implementation
+- A `DelayNs` implementation  
+- A timeout implementation  
+- A thread‑yielding function
 
 Once implemented, your OS becomes compatible with any HAL or driver that depends on `os-trait`.
 
@@ -73,6 +73,7 @@ Basic examples are available in [os_impls.rs](src/os_impls.rs).
 ## 🔖 Keywords
 
 embedded rust · rtos · hal · mutex · delay · timeout · portability · no_std · embedded-hal · traits
+
 
 
 
