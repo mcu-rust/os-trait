@@ -2,21 +2,23 @@
 
 [![CI](https://github.com/mcu-rust/os-trait/workflows/CI/badge.svg)](https://github.com/mcu-rust/os-trait/actions)
 [![Crates.io](https://img.shields.io/crates/v/os-trait.svg)](https://crates.io/crates/os-trait)
+[![Docs.rs](https://docs.rs/os-trait/badge.svg)](https://docs.rs/os-trait)
+[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](./LICENSE)
 [![Downloads](https://img.shields.io/crates/d/os-trait.svg)](https://crates.io/crates/os-trait)
 
-Traits used to adapt different RTOSes to various HAL libraries. It relies on several important crates to achieve this goal.
-- [timeout-trait](https://crates.io/crates/timeout-trait): Traits about timeout.
-- [embedded-hal](https://crates.io/crates/embedded-hal): Using the trait `DelayNs` of it.
-- [mutex](https://crates.io/crates/mutex): Using the struct `BlockingMutex` and the trait `RawMutex` of it.
 
-## Cargo Features
+**`os-trait` provides a unified trait layer for adapting multiple RTOS implementations to embedded Rust HALs.**
+It makes embedded Rust code more portable, testable, and OS‑agnostic by standardizing common OS primitives such as mutexes, delays, timeouts, notifier, and thread yielding.
 
-- `alloc`: Enabled by default.
-- `std`: Used for unit test. Disabled by default.
-- `std-custom-mutex`: Enable it when you want to use `BlockingMutex` instead of STD `Mutex` in STD environment.
+This crate integrates with several foundational components of the embedded Rust ecosystem:
 
-## Usage
-```shell
+- [`timeout-trait`](https://crates.io/crates/timeout-trait) — timeout abstractions
+- [`embedded-hal`](https://crates.io/crates/embedded-hal) — uses the `DelayNs` trait
+- [`mutex`](https://crates.io/crates/mutex) — uses `BlockingMutex` and `RawMutex`
+
+## 📦 Usage
+
+```sh
 cargo add os-trait
 ```
 
@@ -34,7 +36,9 @@ fn use_os<OS: OsInterface>() {
     OS::delay().delay_ms(1);
 
     let mut t = OS::timeout().start_ms(1);
-    if t.timeout() {}
+    if t.timeout() {
+        // handle timeout
+    }
 }
 
 fn select_os() {
@@ -43,4 +47,28 @@ fn select_os() {
 }
 ```
 
-You can find more examples about implementation and usage at [os_impls.rs](src/os_impls.rs)
+## ⚙️ Cargo Features
+
+| Feature             | Default | Description                                                                 |
+|---------------------|---------|-----------------------------------------------------------------------------|
+| `alloc`             | ✔️      | Enables allocation support                                                  |
+| `std`               | ❌      | Enables `std` for unit testing                                              |
+| `std-custom-mutex`  | ❌      | Use `BlockingMutex` instead of `std::sync::Mutex` in `std` environments     |
+
+## 🧩 Implementing Your Own OS
+
+Implement the `OsInterface` trait and provide:
+- A `RawMutex` implementation
+- A `Notifier` implementation
+- A `DelayNs` implementation
+- A timeout implementation
+- A thread‑yielding function
+
+Once implemented, your OS becomes compatible with any HAL or driver that depends on `os-trait`.
+
+For a full implementation example, see [os_trait_impls.rs for FreeRTOS](https://github.com/mcu-rust/FreeRTOS/blob/main/freertos/src/os_trait_impls.rs).
+Basic examples are available in [os_impls.rs](src/os_impls.rs).
+
+## 🔖 Keywords
+
+embedded rust · rtos · hal · mutex · delay · timeout · portability · no_std · embedded-hal · traits
