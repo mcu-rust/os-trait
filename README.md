@@ -34,11 +34,6 @@ fn use_os<OS: OsInterface>() {
     OS::yield_thread();
 
     OS::delay().delay_ms(1);
-
-    let mut t = OS::timeout().start_ms(1);
-    if t.timeout() {
-        // handle timeout
-    }
 }
 
 fn select_os() {

@@ -1,6 +1,4 @@
-use timeout_trait::TimeoutState;
-
-use crate::{OsInterface, TimeoutNs, fugit::MicrosDurationU32};
+use crate::{OsInterface, Timeout, fugit::MicrosDurationU32, prelude::*};
 
 /// This method should be able to call from task or ISR.
 /// The implementation should handle the different situations.
@@ -42,13 +40,16 @@ pub trait NotifyWaiter: Send {
     ) -> Option<U> {
         assert!(count > 0);
         let wait_t = MicrosDurationU32::from_ticks(timeout.ticks() / count);
-        let mut t = OS::timeout().start_us(timeout.ticks());
+        let mut t = Timeout::<OS>::from_micros(timeout.ticks());
         loop {
             if let Some(rst) = f() {
                 return Some(rst);
             } else if t.timeout() {
                 return None;
             }
+
+            // TODO: let left = t.time_left(&dur);
+
             self.wait(wait_t);
         }
     }

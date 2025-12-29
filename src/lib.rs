@@ -36,7 +36,7 @@ extern crate alloc;
 /// And you can implement your own mutex by implementing the `RawMutex` trait from the `mutex-traits` crate.
 ///
 /// ```
-/// use os_trait::{prelude::*, FakeOs, StdOs};
+/// use os_trait::{prelude::*, FakeOs, StdOs, Duration, Timeout};
 ///
 /// fn use_os<OS: OsInterface>() {
 ///     let mutex = OS::mutex(2);
@@ -48,8 +48,10 @@ extern crate alloc;
 ///
 ///     OS::delay().delay_ms(1);
 ///
-///     let mut t = OS::timeout().start_ms(1);
-///     if t.timeout() {}
+///     let mut t = Timeout::<OS>::from_millis(1);
+///     if t.timeout() {
+///         // handle timeout
+///     }
 /// }
 ///
 /// fn select_os() {
@@ -61,8 +63,7 @@ pub trait OsInterface: Send + Sync + 'static {
     type RawMutex: ConstInit + RawMutex;
     type Notifier: Notifier;
     type NotifyWaiter: NotifyWaiter;
-    type Timeout: TimeoutNs<TimeoutState = Self::TimeoutState>;
-    type TimeoutState: TimeoutState;
+    type Instant: TickInstant;
     type Delay: DelayNs;
 
     /// It's used to avoid writing `foo::<OS, _, _, _>(...)`
@@ -75,7 +76,6 @@ pub trait OsInterface: Send + Sync + 'static {
         Self::yield_thread()
     }
 
-    fn timeout() -> Self::Timeout;
     fn delay() -> Self::Delay;
     fn notify() -> (Self::Notifier, Self::NotifyWaiter);
 
@@ -84,3 +84,6 @@ pub trait OsInterface: Send + Sync + 'static {
         Mutex::<Self, T>::new(d)
     }
 }
+
+pub type Timeout<OS> = TickTimeout<<OS as OsInterface>::Instant>;
+pub type Duration<OS> = TickDuration<<OS as OsInterface>::Instant>;

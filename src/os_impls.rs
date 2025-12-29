@@ -20,8 +20,7 @@ impl OsInterface for StdOs {
     type RawMutex = FakeRawMutex;
     type Notifier = StdNotifier;
     type NotifyWaiter = StdNotifyWaiter;
-    type Timeout = StdTimeoutNs;
-    type TimeoutState = StdTimeoutState;
+    type Instant = StdTickInstant;
     type Delay = StdDelayNs;
 
     const O: Self = Self {};
@@ -29,11 +28,6 @@ impl OsInterface for StdOs {
     #[inline]
     fn yield_thread() {
         thread::yield_now();
-    }
-
-    #[inline]
-    fn timeout() -> Self::Timeout {
-        StdTimeoutNs {}
     }
 
     #[inline]
@@ -54,9 +48,8 @@ impl OsInterface for FakeOs {
     type RawMutex = FakeRawMutex;
     type Notifier = FakeNotifier;
     type NotifyWaiter = FakeNotifier;
-    type Timeout = FakeTimeoutNs;
-    type TimeoutState = FakeTimeoutState;
-    type Delay = TickDelay<FakeInstant>;
+    type Instant = FakeTickInstant;
+    type Delay = TickDelay<FakeTickInstant>;
 
     const O: Self = Self {};
 
@@ -64,13 +57,8 @@ impl OsInterface for FakeOs {
     fn yield_thread() {}
 
     #[inline]
-    fn timeout() -> Self::Timeout {
-        FakeTimeoutNs::new()
-    }
-
-    #[inline]
     fn delay() -> Self::Delay {
-        TickDelay::<FakeInstant>::default()
+        TickDelay::<FakeTickInstant>::default()
     }
 
     #[inline]
@@ -85,13 +73,13 @@ impl OsInterface for FakeOs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::fugit::ExtU32;
+    use crate::{Timeout, fugit::ExtU32};
 
     struct OsUser<OS: OsInterface> {
         notifier: OS::Notifier,
         waiter: OS::NotifyWaiter,
         mutex: Mutex<OS, u8>,
-        interval: OS::TimeoutState,
+        interval: Timeout<OS>,
     }
 
     impl<OS: OsInterface> OsUser<OS> {
@@ -101,7 +89,7 @@ mod tests {
                 notifier,
                 waiter,
                 mutex: OS::mutex(1),
-                interval: OS::timeout().start_ms(1),
+                interval: Timeout::<OS>::from_millis(1),
             }
         }
 
@@ -131,7 +119,7 @@ mod tests {
             let mut d = self.mutex.lock();
             *d = 2;
 
-            self.interval.timeout();
+            if self.interval.timeout() {}
         }
     }
 
