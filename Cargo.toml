@@ -8,7 +8,7 @@
     name = "os-trait"
     readme = "README.md"
     repository = "https://github.com/mcu-rust/os-trait"
-    version = "0.6.1"
+    version = "0.7.0"
 
 
     [package.metadata.docs.rs]
@@ -26,3 +26,4 @@
     mutex = "1"
     mutex-traits = "1"
     timeout-trait = "0.5"
+    # timeout-trait = { path = "../timeout-trait" }
