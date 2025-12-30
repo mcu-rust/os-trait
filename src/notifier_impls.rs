@@ -1,4 +1,4 @@
-use crate::{fugit::MicrosDurationU32, notifier::*, *};
+use crate::{notifier::*, *};
 use core::{
     marker::PhantomData,
     sync::atomic::{AtomicBool, Ordering},
@@ -19,8 +19,8 @@ impl Notifier for FakeNotifier {
     }
 }
 
-impl NotifyWaiter for FakeNotifier {
-    fn wait(&self, _timeout: MicrosDurationU32) -> bool {
+impl<OS: OsInterface> NotifyWaiter<OS> for FakeNotifier {
+    fn wait(&self, _timeout: &Duration<OS>) -> bool {
         true
     }
 }
@@ -68,9 +68,9 @@ pub struct AtomicNotifyWaiter<OS> {
     _os: PhantomData<OS>,
 }
 
-impl<OS: OsInterface> NotifyWaiter for AtomicNotifyWaiter<OS> {
-    fn wait(&self, timeout: MicrosDurationU32) -> bool {
-        let mut t = Timeout::<OS>::from_micros(timeout.ticks());
+impl<OS: OsInterface> NotifyWaiter<OS> for AtomicNotifyWaiter<OS> {
+    fn wait(&self, timeout: &Duration<OS>) -> bool {
+        let mut t = Timeout::<OS>::from_duration(timeout);
         while !t.timeout() {
             if self
                 .flag
@@ -96,7 +96,6 @@ mod std_impl {
         Arc,
         atomic::{AtomicBool, Ordering},
     };
-    use std::time::Instant;
 
     /// This implementation is only for unit testing.
     #[derive(Clone)]
@@ -128,10 +127,10 @@ mod std_impl {
         flag: Arc<AtomicBool>,
     }
 
-    impl NotifyWaiter for StdNotifyWaiter {
-        fn wait(&self, timeout: MicrosDurationU32) -> bool {
-            let now = Instant::now();
-            while now.elapsed().as_micros() < timeout.to_micros().into() {
+    impl NotifyWaiter<StdOs> for StdNotifyWaiter {
+        fn wait(&self, timeout: &Duration<StdOs>) -> bool {
+            let mut t = Timeout::<StdOs>::from_duration(timeout);
+            while !t.timeout() {
                 if self
                     .flag
                     .compare_exchange(true, false, Ordering::SeqCst, Ordering::Acquire)
@@ -148,27 +147,27 @@ mod std_impl {
     #[cfg(test)]
     mod tests {
         use super::*;
-        use fugit::ExtU32;
         use std::thread;
+        type OsDuration = Duration<StdOs>;
 
         #[test]
         fn notify() {
             let (n, w) = StdNotifier::new();
-            assert!(!w.wait(1.millis()));
+            assert!(!w.wait(&OsDuration::from_millis(1)));
             n.notify();
-            assert!(w.wait(1.millis()));
+            assert!(w.wait(&OsDuration::from_millis(1)));
 
             let mut handles = vec![];
 
             let n2 = n.clone();
 
             handles.push(thread::spawn(move || {
-                assert!(w.wait(2000.millis()));
-                assert!(w.wait(2000.millis()));
+                assert!(w.wait(&OsDuration::from_millis(2000)));
+                assert!(w.wait(&OsDuration::from_millis(2000)));
 
                 let mut i = 0;
                 assert_eq!(
-                    w.wait_with(StdOs::O, 100.millis(), 4, || {
+                    w.wait_with(&OsDuration::from_millis(100), 4, || {
                         i += 1;
                         None::<()>
                     }),

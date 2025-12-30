@@ -2,7 +2,7 @@ use crate::{
     mutex_impls::*,
     notifier_impls::*,
     prelude::*,
-    timeout_trait::{delay_impls::*, fake_impls::*},
+    timeout_trait::{delay::*, fake_impls::*},
 };
 cfg_if::cfg_if! {
     if #[cfg(feature = "std")] {
@@ -73,7 +73,7 @@ impl OsInterface for FakeOs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Timeout, fugit::ExtU32};
+    use crate::{Duration, Timeout};
 
     struct OsUser<OS: OsInterface> {
         notifier: OS::Notifier,
@@ -114,7 +114,7 @@ mod tests {
             let _os = OS::O;
 
             assert!(self.notifier.notify());
-            assert!(self.waiter.wait(1.millis()));
+            assert!(self.waiter.wait(&Duration::<OS>::from_millis(1)));
 
             let mut d = self.mutex.lock();
             *d = 2;

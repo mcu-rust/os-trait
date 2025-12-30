@@ -1,4 +1,4 @@
-use crate::{OsInterface, Timeout, fugit::MicrosDurationU32, prelude::*};
+use crate::{Duration, OsInterface, Timeout};
 
 /// This method should be able to call from task or ISR.
 /// The implementation should handle the different situations.
@@ -6,12 +6,12 @@ pub trait Notifier: Send + Clone {
     fn notify(&self) -> bool;
 }
 
-pub trait NotifyWaiter: Send {
+pub trait NotifyWaiter<OS: OsInterface>: Send {
     /// Wait until notified or timeout occurs.
     /// # Returns
     ///   - `true` notified
     ///   - `false` timeout occurred
-    fn wait(&self, timeout: MicrosDurationU32) -> bool;
+    fn wait(&self, timeout: &Duration<OS>) -> bool;
 
     /// # Description
     /// Wait for a notification, but it can split the total timeout into small timeout.
@@ -31,16 +31,15 @@ pub trait NotifyWaiter: Send {
     /// # Note
     /// It may call your function more times than expected and wait longer than expected.
     #[inline]
-    fn wait_with<OS: OsInterface, U>(
+    fn wait_with<U>(
         &self,
-        _os: OS,
-        timeout: MicrosDurationU32,
+        timeout: &Duration<OS>,
         count: u32,
         mut f: impl FnMut() -> Option<U>,
     ) -> Option<U> {
         assert!(count > 0);
-        let wait_t = MicrosDurationU32::from_ticks(timeout.ticks() / count);
-        let mut t = Timeout::<OS>::from_micros(timeout.ticks());
+        let mut wait_t = Duration::<OS>::from_ticks(timeout.ticks() / count as u64);
+        let mut t = Timeout::<OS>::from_duration(timeout);
         loop {
             if let Some(rst) = f() {
                 return Some(rst);
@@ -48,9 +47,11 @@ pub trait NotifyWaiter: Send {
                 return None;
             }
 
-            // TODO: let left = t.time_left(&dur);
-
-            self.wait(wait_t);
+            let left = t.time_left();
+            if left < wait_t {
+                wait_t = left;
+            }
+            self.wait(&wait_t);
         }
     }
 }
