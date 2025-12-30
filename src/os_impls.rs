@@ -1,5 +1,5 @@
 use crate::{
-    mutex_impls::*,
+    mutex::FakeRawMutex,
     notifier_impls::*,
     prelude::*,
     timeout_trait::{delay::*, fake_impls::*},
@@ -73,7 +73,7 @@ impl OsInterface for FakeOs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Duration, Timeout};
+    use crate::{Duration, Mutex, Timeout};
 
     struct OsUser<OS: OsInterface> {
         notifier: OS::Notifier,
@@ -94,7 +94,7 @@ mod tests {
         }
 
         fn use_os(&mut self) {
-            let mutex = OS::mutex(0);
+            let mutex = Mutex::<OS, _>::new(0);
 
             let mut guard = mutex.try_lock().unwrap();
             assert_eq!(*guard, 0);
@@ -110,8 +110,6 @@ mod tests {
 
             OS::yield_thread();
             OS::delay().delay_ms(1);
-
-            let _os = OS::O;
 
             assert!(self.notifier.notify());
             assert!(self.waiter.wait(&Duration::<OS>::from_millis(1)));
@@ -129,5 +127,35 @@ mod tests {
         user.use_os();
         let mut user = OsUser::<StdOs>::new();
         user.use_os();
+    }
+}
+
+#[allow(dead_code)]
+#[cfg(feature = "std")]
+#[cfg(test)]
+mod tests_end_type {
+    use crate::{StdOs as OS, os_type_alias, prelude::*};
+
+    os_type_alias!(OS);
+
+    struct EndUser {
+        notifier: Notifier,
+        waiter: NotifyWaiter,
+        mutex: Mutex<u8>,
+        interval: Timeout,
+        dur: Duration,
+    }
+
+    impl EndUser {
+        pub fn new() -> Self {
+            let (notifier, waiter) = OS::notify();
+            Self {
+                notifier,
+                waiter,
+                mutex: Mutex::new(1),
+                interval: Timeout::from_millis(1),
+                dur: Duration::from_millis(1),
+            }
+        }
     }
 }

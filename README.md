@@ -3,7 +3,7 @@
 [![CI](https://github.com/mcu-rust/os-trait/workflows/CI/badge.svg)](https://github.com/mcu-rust/os-trait/actions)
 [![Crates.io](https://img.shields.io/crates/v/os-trait.svg)](https://crates.io/crates/os-trait)
 [![Docs.rs](https://docs.rs/os-trait/badge.svg)](https://docs.rs/os-trait)
-[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](./LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![Downloads](https://img.shields.io/crates/d/os-trait.svg)](https://crates.io/crates/os-trait)
 
 
@@ -27,12 +27,10 @@ use os_trait::{prelude::*, FakeOs, StdOs};
 
 fn use_os<OS: OsInterface>() {
     let mutex = OS::mutex(2);
-
     let mut guard = mutex.try_lock().unwrap();
     assert_eq!(*guard, 2);
 
     OS::yield_thread();
-
     OS::delay().delay_ms(1);
 }
 
@@ -54,7 +52,7 @@ fn select_os() {
 
 Implement the `OsInterface` trait and provide:
 - A `RawMutex` implementation
-- A `Notifier` implementation
+- A `NotifierInterface` implementation
 - A `DelayNs` implementation
 - A timeout implementation
 - A thread‑yielding function

@@ -2,11 +2,11 @@ use crate::{Duration, OsInterface, Timeout};
 
 /// This method should be able to call from task or ISR.
 /// The implementation should handle the different situations.
-pub trait Notifier: Send + Clone {
+pub trait NotifierInterface: Send + Clone {
     fn notify(&self) -> bool;
 }
 
-pub trait NotifyWaiter<OS: OsInterface>: Send {
+pub trait NotifyWaiterInterface<OS: OsInterface>: Send {
     /// Wait until notified or timeout occurs.
     /// # Returns
     ///   - `true` notified

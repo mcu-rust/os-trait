@@ -1,4 +1,4 @@
-use crate::{notifier::*, *};
+use crate::{Duration, Timeout, notifier::*, prelude::*};
 use core::{
     marker::PhantomData,
     sync::atomic::{AtomicBool, Ordering},
@@ -13,13 +13,13 @@ impl FakeNotifier {
     }
 }
 
-impl Notifier for FakeNotifier {
+impl NotifierInterface for FakeNotifier {
     fn notify(&self) -> bool {
         true
     }
 }
 
-impl<OS: OsInterface> NotifyWaiter<OS> for FakeNotifier {
+impl<OS: OsInterface> NotifyWaiterInterface<OS> for FakeNotifier {
     fn wait(&self, _timeout: &Duration<OS>) -> bool {
         true
     }
@@ -27,7 +27,7 @@ impl<OS: OsInterface> NotifyWaiter<OS> for FakeNotifier {
 
 // ------------------------------------------------------------------
 
-/// This [`Notifier`] implementation is for unit test
+/// This [`NotifierInterface`] implementation is for unit test
 pub struct AtomicNotifier<OS> {
     flag: Arc<AtomicBool>,
     _os: PhantomData<OS>,
@@ -56,7 +56,7 @@ impl<OS: OsInterface> AtomicNotifier<OS> {
     }
 }
 
-impl<OS: OsInterface> Notifier for AtomicNotifier<OS> {
+impl<OS: OsInterface> NotifierInterface for AtomicNotifier<OS> {
     fn notify(&self) -> bool {
         self.flag.store(true, Ordering::Release);
         true
@@ -68,7 +68,7 @@ pub struct AtomicNotifyWaiter<OS> {
     _os: PhantomData<OS>,
 }
 
-impl<OS: OsInterface> NotifyWaiter<OS> for AtomicNotifyWaiter<OS> {
+impl<OS: OsInterface> NotifyWaiterInterface<OS> for AtomicNotifyWaiter<OS> {
     fn wait(&self, timeout: &Duration<OS>) -> bool {
         let mut t = Timeout::<OS>::from_duration(timeout);
         while !t.timeout() {
@@ -92,6 +92,7 @@ pub use std_impl::*;
 #[cfg(feature = "std")]
 mod std_impl {
     use super::*;
+    use crate::os_impls::*;
     use std::sync::{
         Arc,
         atomic::{AtomicBool, Ordering},
@@ -115,7 +116,7 @@ mod std_impl {
         }
     }
 
-    impl Notifier for StdNotifier {
+    impl NotifierInterface for StdNotifier {
         fn notify(&self) -> bool {
             self.flag.store(true, Ordering::Release);
             true
@@ -127,7 +128,7 @@ mod std_impl {
         flag: Arc<AtomicBool>,
     }
 
-    impl NotifyWaiter<StdOs> for StdNotifyWaiter {
+    impl NotifyWaiterInterface<StdOs> for StdNotifyWaiter {
         fn wait(&self, timeout: &Duration<StdOs>) -> bool {
             let mut t = Timeout::<StdOs>::from_duration(timeout);
             while !t.timeout() {

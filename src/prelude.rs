@@ -1,5 +1,8 @@
-pub use crate::{OsInterface, notifier::*, timeout_trait::prelude::*};
-pub use embedded_hal::delay::DelayNs;
+pub use crate::{
+    OsInterface,
+    notifier::{NotifierInterface as _, NotifyWaiterInterface as _},
+    timeout_trait::prelude::*,
+};
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "std")] {

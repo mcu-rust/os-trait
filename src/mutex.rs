@@ -1,7 +1,4 @@
-use crate::{
-    OsInterface,
-    mutex_traits::{ConstInit, RawMutex},
-};
+use crate::mutex_traits::{ConstInit, RawMutex};
 cfg_if::cfg_if! {
     if #[cfg(all(feature = "std", not(feature = "std-custom-mutex")))] {
         pub use std_impl::BlockingMutex;
@@ -9,8 +6,6 @@ cfg_if::cfg_if! {
         pub use mutex::BlockingMutex;
     }
 }
-
-pub type Mutex<OS, T> = BlockingMutex<<OS as OsInterface>::RawMutex, T>;
 
 /// A fake mutex is for testing.
 /// It does not provide any synchronization between threads,
