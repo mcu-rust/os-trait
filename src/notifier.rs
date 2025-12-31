@@ -38,8 +38,8 @@ pub trait NotifyWaiterInterface<OS: OsInterface>: Send {
         mut f: impl FnMut() -> Option<U>,
     ) -> Option<U> {
         assert!(count > 0);
-        let mut wait_t = Duration::<OS>::from_ticks(timeout.ticks() / count as u64);
-        let mut t = Timeout::<OS>::from_duration(timeout);
+        let mut wait_t = Duration::<OS>::from_ticks(timeout.as_ticks() / count as u64);
+        let mut t = Timeout::<OS>::from(timeout);
         loop {
             if let Some(rst) = f() {
                 return Some(rst);

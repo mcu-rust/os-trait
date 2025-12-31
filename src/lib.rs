@@ -7,7 +7,7 @@
 //! # Example
 //!
 //! ```
-//! use os_trait::{prelude::*, FakeOs, StdOs, Duration, Timeout};
+//! use os_trait::{prelude::*, FakeOs, StdOs, Duration, Timeout, Instant};
 //!
 //! fn use_os<OS: OsInterface>() {
 //!     let mutex = OS::mutex(2);
@@ -18,14 +18,18 @@
 //!     OS::yield_thread();
 //!     OS::delay().delay_ms(1);
 //!
-//!     let mut t = Timeout::<OS>::from_millis(1);
+//!     let mut t = Timeout::<OS>::millis(1);
 //!     if t.timeout() {
 //!         // handle timeout
 //!     }
 //!
+//!     let mut now = Instant::<OS>::now();
+//!     now.elapsed();
+//!     if now.timeout(&Duration::<OS>::millis(1)) {}
+//!
 //!     let (notifier, waiter) = OS::notify();
 //!     assert!(notifier.notify());
-//!     assert!(waiter.wait(&Duration::<OS>::from_millis(1)));
+//!     assert!(waiter.wait(&Duration::<OS>::millis(1)));
 //! }
 //!
 //! fn select_os() {
@@ -45,12 +49,14 @@
 //!     OS::yield_thread();
 //!     OS::delay().delay_ms(1);
 //!
-//!     let t = Timeout::from_millis(1);
-//!     let dur = Duration::from_millis(1);
+//!     let t = Timeout::millis(1);
+//!     let dur = Duration::millis(1);
+//!     let mut now = Instant::now();
+//!     if now.timeout(&dur) {}
 //!
 //!     let (notifier, waiter) = OS::notify();
 //!     assert!(notifier.notify());
-//!     assert!(waiter.wait(&Duration::from_millis(1)));
+//!     assert!(waiter.wait(&Duration::millis(1)));
 //! }
 //! ```
 
@@ -104,8 +110,10 @@ pub trait OsInterface: Send + Sync + Sized + 'static {
 pub type Mutex<OS, T> = BlockingMutex<<OS as OsInterface>::RawMutex, T>;
 pub type Notifier<OS> = <OS as OsInterface>::Notifier;
 pub type NotifyWaiter<OS> = <OS as OsInterface>::NotifyWaiter;
-pub type Timeout<OS> = TickTimeout<<OS as OsInterface>::Instant>;
-pub type Duration<OS> = TickDuration<<OS as OsInterface>::Instant>;
+pub type Instant<OS> = <OS as OsInterface>::Instant;
+pub type Duration<OS> = TickDuration<Instant<OS>>;
+pub type Timeout<OS> = TickTimeout<Instant<OS>>;
+pub type Delay<OS> = <OS as OsInterface>::Delay;
 
 /// Use this macro to alias the OS-specific types for greater convenience,
 /// or manually alias only the ones you need.
@@ -115,7 +123,9 @@ macro_rules! os_type_alias {
         pub type Mutex<T> = $crate::Mutex<$YOUR_OS, T>;
         pub type Notifier = $crate::Notifier<$YOUR_OS>;
         pub type NotifyWaiter = $crate::NotifyWaiter<$YOUR_OS>;
-        pub type Timeout = $crate::Timeout<$YOUR_OS>;
+        pub type Instant = $crate::Instant<$YOUR_OS>;
         pub type Duration = $crate::Duration<$YOUR_OS>;
+        pub type Timeout = $crate::Timeout<$YOUR_OS>;
+        pub type Delay = $crate::Delay<$YOUR_OS>;
     };
 }

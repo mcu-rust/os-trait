@@ -73,13 +73,15 @@ impl OsInterface for FakeOs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Duration, Mutex, Timeout};
+    use crate::{Delay, Duration, Instant, Mutex, Timeout};
 
     struct OsUser<OS: OsInterface> {
         notifier: OS::Notifier,
         waiter: OS::NotifyWaiter,
         mutex: Mutex<OS, u8>,
         interval: Timeout<OS>,
+        now: Instant<OS>,
+        delay: Delay<OS>,
     }
 
     impl<OS: OsInterface> OsUser<OS> {
@@ -89,7 +91,9 @@ mod tests {
                 notifier,
                 waiter,
                 mutex: OS::mutex(1),
-                interval: Timeout::<OS>::from_millis(1),
+                interval: Timeout::<OS>::millis(1),
+                now: Instant::<OS>::now(),
+                delay: OS::delay(),
             }
         }
 
@@ -112,12 +116,15 @@ mod tests {
             OS::delay().delay_ms(1);
 
             assert!(self.notifier.notify());
-            assert!(self.waiter.wait(&Duration::<OS>::from_millis(1)));
+            assert!(self.waiter.wait(&Duration::<OS>::millis(1)));
 
             let mut d = self.mutex.lock();
             *d = 2;
 
-            if self.interval.timeout() {}
+            self.interval.timeout();
+
+            self.delay.delay_ns(1);
+            self.now.elapsed();
         }
     }
 
@@ -144,6 +151,8 @@ mod tests_end_type {
         mutex: Mutex<u8>,
         interval: Timeout,
         dur: Duration,
+        now: Instant,
+        delay: Delay,
     }
 
     impl EndUser {
@@ -153,8 +162,10 @@ mod tests_end_type {
                 notifier,
                 waiter,
                 mutex: Mutex::new(1),
-                interval: Timeout::from_millis(1),
-                dur: Duration::from_millis(1),
+                interval: Timeout::millis(1),
+                dur: Duration::millis(1),
+                now: Instant::now(),
+                delay: OS::delay(),
             }
         }
     }

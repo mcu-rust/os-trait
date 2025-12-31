@@ -70,7 +70,7 @@ pub struct AtomicNotifyWaiter<OS> {
 
 impl<OS: OsInterface> NotifyWaiterInterface<OS> for AtomicNotifyWaiter<OS> {
     fn wait(&self, timeout: &Duration<OS>) -> bool {
-        let mut t = Timeout::<OS>::from_duration(timeout);
+        let mut t = Timeout::<OS>::from(timeout);
         while !t.timeout() {
             if self
                 .flag
@@ -130,7 +130,7 @@ mod std_impl {
 
     impl NotifyWaiterInterface<StdOs> for StdNotifyWaiter {
         fn wait(&self, timeout: &Duration<StdOs>) -> bool {
-            let mut t = Timeout::<StdOs>::from_duration(timeout);
+            let mut t = Timeout::<StdOs>::from(timeout);
             while !t.timeout() {
                 if self
                     .flag
@@ -154,21 +154,21 @@ mod std_impl {
         #[test]
         fn notify() {
             let (n, w) = StdNotifier::new();
-            assert!(!w.wait(&OsDuration::from_millis(1)));
+            assert!(!w.wait(&OsDuration::millis(1)));
             n.notify();
-            assert!(w.wait(&OsDuration::from_millis(1)));
+            assert!(w.wait(&OsDuration::millis(1)));
 
             let mut handles = vec![];
 
             let n2 = n.clone();
 
             handles.push(thread::spawn(move || {
-                assert!(w.wait(&OsDuration::from_millis(2000)));
-                assert!(w.wait(&OsDuration::from_millis(2000)));
+                assert!(w.wait(&OsDuration::millis(2000)));
+                assert!(w.wait(&OsDuration::millis(2000)));
 
                 let mut i = 0;
                 assert_eq!(
-                    w.wait_with(&OsDuration::from_millis(100), 4, || {
+                    w.wait_with(&OsDuration::millis(100), 4, || {
                         i += 1;
                         None::<()>
                     }),
