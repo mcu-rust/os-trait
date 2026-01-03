@@ -75,6 +75,7 @@ pub use mutex_traits::{ConstInit, RawMutex};
 pub use notifier::*;
 pub use notifier_impls::*;
 pub use os_impls::{FakeOs, StdOs};
+pub use portable_atomic;
 pub use timeout_trait::{self, *};
 
 #[cfg(feature = "alloc")]

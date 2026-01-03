@@ -23,4 +23,5 @@
     cfg-if = "1"
     mutex = "1"
     mutex-traits = "1"
+    portable-atomic = "1.13.0"
     timeout-trait = "0.8"

@@ -1,8 +1,6 @@
 use crate::{Duration, Timeout, notifier::*, prelude::*};
-use core::{
-    marker::PhantomData,
-    sync::atomic::{AtomicBool, Ordering},
-};
+use core::marker::PhantomData;
+use portable_atomic::{AtomicBool, Ordering};
 
 #[derive(Clone)]
 pub struct FakeNotifier;
@@ -71,17 +69,14 @@ pub struct AtomicNotifyWaiter<OS> {
 impl<OS: OsInterface> NotifyWaiterInterface<OS> for AtomicNotifyWaiter<OS> {
     fn wait(&self, timeout: &Duration<OS>) -> bool {
         let mut t = Timeout::<OS>::from(timeout);
-        while !t.timeout() {
-            if self
-                .flag
-                .compare_exchange(true, false, Ordering::SeqCst, Ordering::Acquire)
-                .is_ok()
-            {
+        loop {
+            if self.flag.swap(false, Ordering::AcqRel) {
                 return true;
+            } else if t.timeout() {
+                return false;
             }
             OS::yield_thread();
         }
-        false
     }
 }
 
