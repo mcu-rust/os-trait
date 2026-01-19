@@ -1,65 +1,4 @@
-//! Traits used to adapter different embedded RTOS.
-//! It defines a trait [`OsInterface`].
-//!
-//! We use the [`mutex-traits`](https://crates.io/crates/mutex-traits) crate to provide mutex functionality.
-//! You can implement your own mutex by implementing the `RawMutex` trait from the `mutex-traits` crate.
-//!
-//! # Example
-//!
-//! ```
-//! use os_trait::{prelude::*, FakeOs, StdOs, Duration, Timeout, Instant};
-//!
-//! fn use_os<OS: OsInterface>() {
-//!     let mutex = OS::mutex(2);
-//!
-//!     let mut guard = mutex.try_lock().unwrap();
-//!     assert_eq!(*guard, 2);
-//!
-//!     OS::yield_thread();
-//!     OS::delay().delay_ms(1);
-//!
-//!     let mut t = Timeout::<OS>::millis(1);
-//!     if t.timeout() {
-//!         // handle timeout
-//!     }
-//!
-//!     let mut now = Instant::<OS>::now();
-//!     now.elapsed();
-//!     if now.timeout(&Duration::<OS>::millis(1)) {}
-//!
-//!     let (notifier, waiter) = OS::notify();
-//!     assert!(notifier.notify());
-//!     assert!(waiter.wait(&Duration::<OS>::millis(1)));
-//! }
-//!
-//! fn select_os() {
-//!     use_os::<FakeOs>();
-//!     use_os::<StdOs>();
-//! }
-//! ```
-//!
-//! Use alias for convenience:
-//! ```
-//! use os_trait::{prelude::*, StdOs as OS, os_type_alias};
-//!
-//! os_type_alias!(OS);
-//!
-//! fn use_os_type() {
-//!     let mutex = Mutex::new(2);
-//!     OS::yield_thread();
-//!     OS::delay().delay_ms(1);
-//!
-//!     let t = Timeout::millis(1);
-//!     let dur = Duration::millis(1);
-//!     let mut now = Instant::now();
-//!     if now.timeout(&dur) {}
-//!
-//!     let (notifier, waiter) = OS::notify();
-//!     assert!(notifier.notify());
-//!     assert!(waiter.wait(&Duration::millis(1)));
-//! }
-//! ```
-
+#![doc = include_str!("../README.md")]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod mutex;
@@ -82,6 +21,9 @@ pub use timeout_trait::{self, *};
 extern crate alloc;
 
 /// The interface for different operating systems.
+///
+/// We use the [`mutex-traits`](https://crates.io/crates/mutex-traits) crate to provide mutex functionality.
+/// You can implement your own mutex by implementing the `RawMutex` trait from the `mutex-traits` crate.
 pub trait OsInterface: Send + Sync + Sized + 'static {
     type RawMutex: ConstInit + RawMutex;
     type Notifier: NotifierInterface;

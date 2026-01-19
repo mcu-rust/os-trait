@@ -23,20 +23,57 @@ cargo add os-trait
 ```
 
 ```rust
-use os_trait::{prelude::*, FakeOs, StdOs};
+use os_trait::{prelude::*, FakeOs, StdOs, Duration, Timeout, Instant};
 
 fn use_os<OS: OsInterface>() {
     let mutex = OS::mutex(2);
+
     let mut guard = mutex.try_lock().unwrap();
     assert_eq!(*guard, 2);
 
     OS::yield_thread();
     OS::delay().delay_ms(1);
+
+    let mut t = Timeout::<OS>::millis(1);
+    if t.timeout() {
+        // handle timeout
+    }
+
+    let mut now = Instant::<OS>::now();
+    now.elapsed();
+    if now.timeout(&Duration::<OS>::millis(1)) {}
+
+    let (notifier, waiter) = OS::notify();
+    assert!(notifier.notify());
+    assert!(waiter.wait(&Duration::<OS>::millis(1)));
 }
 
 fn select_os() {
     use_os::<FakeOs>();
     use_os::<StdOs>();
+}
+```
+
+Use alias for convenience:
+
+```rust
+use os_trait::{prelude::*, StdOs as OS, os_type_alias};
+
+os_type_alias!(OS);
+
+fn use_os_type() {
+    let mutex = Mutex::new(2);
+    OS::yield_thread();
+    OS::delay().delay_ms(1);
+
+    let t = Timeout::millis(1);
+    let dur = Duration::millis(1);
+    let mut now = Instant::now();
+    if now.timeout(&dur) {}
+
+    let (notifier, waiter) = OS::notify();
+    assert!(notifier.notify());
+    assert!(waiter.wait(&Duration::millis(1)));
 }
 ```
 
@@ -59,8 +96,8 @@ Implement the `OsInterface` trait and provide:
 
 Once implemented, your OS becomes compatible with any HAL or driver that depends on `os-trait`.
 
-For a full implementation example, see [os_trait_impls.rs for FreeRTOS](https://github.com/mcu-rust/FreeRTOS/blob/main/freertos/src/os_trait_impls.rs).
-Basic examples are available in [os_impls.rs](src/os_impls.rs).
+For a Basic examples are available in [os_impls.rs](src/os_impls.rs). Full implementation example, see [os_trait_impls.rs for FreeRTOS](https://github.com/mcu-rust/FreeRTOS/blob/main/freertos/src/os_trait_impls.rs).
+
 
 ## 🔖 Keywords
 
