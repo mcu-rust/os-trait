@@ -163,13 +163,13 @@ mod std_impl {
 
                 let mut i = 0;
                 assert_eq!(
-                    w.wait_with(&OsDuration::millis(100), 4, || {
+                    w.wait_with(&OsDuration::millis(100), || {
                         i += 1;
                         None::<()>
                     }),
                     None
                 );
-                assert_eq!(i, 5);
+                assert_eq!(i, 2);
             }));
 
             handles.push(thread::spawn(move || {
